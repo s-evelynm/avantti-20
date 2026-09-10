@@ -82,6 +82,7 @@ interface Ctx {
     stageId: string,
     scores: Record<string, number>,
     comment: string,
+    draft?: boolean,
   ) => void;
   classifyIdea: (ideaId: string, stageId: string, option: string) => void;
   advanceIdea: (ideaId: string, toStageId: string) => void;
