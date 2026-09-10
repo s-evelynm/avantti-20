@@ -10,33 +10,154 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ObjetivosRouteImport } from './routes/objetivos'
+import { Route as DesafiosIndexRouteImport } from './routes/desafios/index'
+import { Route as DesafiosChallengeIdRouteImport } from './routes/desafios/$challengeId'
+import { Route as DesafiosNovoRouteImport } from './routes/desafios/novo'
+import { Route as ExplorarIndexRouteImport } from './routes/explorar/index'
+import { Route as ExplorarChallengeIdRouteImport } from './routes/explorar/$challengeId'
+import { Route as ProgramasIndexRouteImport } from './routes/programas/index'
+import { Route as ProgramasProgramIdRouteImport } from './routes/programas/$programId'
+import { Route as ProgramasNovoRouteImport } from './routes/programas/novo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ObjetivosRoute = ObjetivosRouteImport.update({
+  id: '/objetivos',
+  path: '/objetivos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosIndexRoute = DesafiosIndexRouteImport.update({
+  id: '/desafios/',
+  path: '/desafios/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosChallengeIdRoute = DesafiosChallengeIdRouteImport.update({
+  id: '/desafios/$challengeId',
+  path: '/desafios/$challengeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosNovoRoute = DesafiosNovoRouteImport.update({
+  id: '/desafios/novo',
+  path: '/desafios/novo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorarIndexRoute = ExplorarIndexRouteImport.update({
+  id: '/explorar/',
+  path: '/explorar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorarChallengeIdRoute = ExplorarChallengeIdRouteImport.update({
+  id: '/explorar/$challengeId',
+  path: '/explorar/$challengeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
+  id: '/programas/',
+  path: '/programas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasProgramIdRoute = ProgramasProgramIdRouteImport.update({
+  id: '/programas/$programId',
+  path: '/programas/$programId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasNovoRoute = ProgramasNovoRouteImport.update({
+  id: '/programas/novo',
+  path: '/programas/novo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/objetivos': typeof ObjetivosRoute
+  '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
+  '/desafios/novo': typeof DesafiosNovoRoute
+  '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/programas/$programId': typeof ProgramasProgramIdRoute
+  '/programas/novo': typeof ProgramasNovoRoute
+  '/desafios/': typeof DesafiosIndexRoute
+  '/explorar/': typeof ExplorarIndexRoute
+  '/programas/': typeof ProgramasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/objetivos': typeof ObjetivosRoute
+  '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
+  '/desafios/novo': typeof DesafiosNovoRoute
+  '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/programas/$programId': typeof ProgramasProgramIdRoute
+  '/programas/novo': typeof ProgramasNovoRoute
+  '/desafios': typeof DesafiosIndexRoute
+  '/explorar': typeof ExplorarIndexRoute
+  '/programas': typeof ProgramasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/objetivos': typeof ObjetivosRoute
+  '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
+  '/desafios/novo': typeof DesafiosNovoRoute
+  '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/programas/$programId': typeof ProgramasProgramIdRoute
+  '/programas/novo': typeof ProgramasNovoRoute
+  '/desafios/': typeof DesafiosIndexRoute
+  '/explorar/': typeof ExplorarIndexRoute
+  '/programas/': typeof ProgramasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/objetivos'
+    | '/desafios/$challengeId'
+    | '/desafios/novo'
+    | '/explorar/$challengeId'
+    | '/programas/$programId'
+    | '/programas/novo'
+    | '/desafios/'
+    | '/explorar/'
+    | '/programas/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/objetivos'
+    | '/desafios/$challengeId'
+    | '/desafios/novo'
+    | '/explorar/$challengeId'
+    | '/programas/$programId'
+    | '/programas/novo'
+    | '/desafios'
+    | '/explorar'
+    | '/programas'
+  id:
+    | '__root__'
+    | '/'
+    | '/objetivos'
+    | '/desafios/$challengeId'
+    | '/desafios/novo'
+    | '/explorar/$challengeId'
+    | '/programas/$programId'
+    | '/programas/novo'
+    | '/desafios/'
+    | '/explorar/'
+    | '/programas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ObjetivosRoute: typeof ObjetivosRoute
+  DesafiosChallengeIdRoute: typeof DesafiosChallengeIdRoute
+  DesafiosNovoRoute: typeof DesafiosNovoRoute
+  ExplorarChallengeIdRoute: typeof ExplorarChallengeIdRoute
+  ProgramasProgramIdRoute: typeof ProgramasProgramIdRoute
+  ProgramasNovoRoute: typeof ProgramasNovoRoute
+  DesafiosIndexRoute: typeof DesafiosIndexRoute
+  ExplorarIndexRoute: typeof ExplorarIndexRoute
+  ProgramasIndexRoute: typeof ProgramasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/objetivos': {
+      id: '/objetivos'
+      path: '/objetivos'
+      fullPath: '/objetivos'
+      preLoaderRoute: typeof ObjetivosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios/': {
+      id: '/desafios/'
+      path: '/desafios'
+      fullPath: '/desafios/'
+      preLoaderRoute: typeof DesafiosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios/$challengeId': {
+      id: '/desafios/$challengeId'
+      path: '/desafios/$challengeId'
+      fullPath: '/desafios/$challengeId'
+      preLoaderRoute: typeof DesafiosChallengeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios/novo': {
+      id: '/desafios/novo'
+      path: '/desafios/novo'
+      fullPath: '/desafios/novo'
+      preLoaderRoute: typeof DesafiosNovoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorar/': {
+      id: '/explorar/'
+      path: '/explorar'
+      fullPath: '/explorar/'
+      preLoaderRoute: typeof ExplorarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorar/$challengeId': {
+      id: '/explorar/$challengeId'
+      path: '/explorar/$challengeId'
+      fullPath: '/explorar/$challengeId'
+      preLoaderRoute: typeof ExplorarChallengeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programas/': {
+      id: '/programas/'
+      path: '/programas'
+      fullPath: '/programas/'
+      preLoaderRoute: typeof ProgramasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programas/$programId': {
+      id: '/programas/$programId'
+      path: '/programas/$programId'
+      fullPath: '/programas/$programId'
+      preLoaderRoute: typeof ProgramasProgramIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programas/novo': {
+      id: '/programas/novo'
+      path: '/programas/novo'
+      fullPath: '/programas/novo'
+      preLoaderRoute: typeof ProgramasNovoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ObjetivosRoute: ObjetivosRoute,
+  DesafiosChallengeIdRoute: DesafiosChallengeIdRoute,
+  DesafiosNovoRoute: DesafiosNovoRoute,
+  ExplorarChallengeIdRoute: ExplorarChallengeIdRoute,
+  ProgramasProgramIdRoute: ProgramasProgramIdRoute,
+  ProgramasNovoRoute: ProgramasNovoRoute,
+  DesafiosIndexRoute: DesafiosIndexRoute,
+  ExplorarIndexRoute: ExplorarIndexRoute,
+  ProgramasIndexRoute: ProgramasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
