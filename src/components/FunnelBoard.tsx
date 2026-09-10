@@ -80,6 +80,8 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
               <ul className="mt-3 space-y-2">
                 {cards.map((idea) => {
                   const ready = isReady(challenge, stage, idea);
+                  const triage = funnel.stages[0]?.id === stage.id ? triageChecklist(idea) : null;
+                  const dup = triage ? duplicateOf(idea.id) : null;
                   return (
                     <li key={idea.id}>
                       <button
