@@ -149,6 +149,20 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
 
   const author = users.find((u) => u.id === idea.authorId)?.name ?? "Autor";
 
+  /* triagem: primeira etapa do funil */
+  const isTriage = !!stage && funnel.stages[0]?.id === stage.id;
+  const checklist = triageChecklist(idea);
+  const duplicateId = duplicateOf(idea.id);
+  const duplicate = allIdeas.find((i) => i.id === duplicateId) ?? null;
+  const [duplicateStatus, setDuplicateStatus] = useState<"aberto" | "mantida" | "duplicata" | "ignorado">(
+    "aberto",
+  );
+  const [comparing, setComparing] = useState(false);
+
+  const suggestion = stage
+    ? suggestEvaluators(idea, challenge.evaluatorPoolIds, allIdeas, cfg?.evaluatorsNeeded ?? 1)
+    : null;
+
   return (
     <>
       <DialogHeader>
