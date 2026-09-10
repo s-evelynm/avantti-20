@@ -330,7 +330,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       );
   };
 
-  const saveEvaluation: Ctx["saveEvaluation"] = (ideaId, stageId, scores, comment) => {
+  const saveEvaluation: Ctx["saveEvaluation"] = (ideaId, stageId, scores, comment, draft = false) => {
     const idea = ideas.find((i) => i.id === ideaId);
     const now = new Date().toISOString();
     let wasEdit = false;
@@ -341,11 +341,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           (e) => e.stageId === stageId && e.evaluatorId === viewer.id,
         );
         if (existing?.locked) return i;
-        wasEdit = !!existing;
+        wasEdit = !!existing && !existing.draft;
         const evaluations = existing
           ? i.evaluations.map((e) =>
               e.id === existing.id
-                ? { ...e, scores, comment, updatedAt: now, edited: true }
+                ? { ...e, scores, comment, updatedAt: now, edited: wasEdit, draft }
                 : e,
             )
           : [
@@ -359,18 +359,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 createdAt: now,
                 edited: false,
                 locked: false,
+                draft,
               },
             ];
         return { ...i, evaluations };
       }),
     );
-    if (idea)
+    if (idea && !draft)
       ideaLog(
         idea,
         wasEdit ? "Avaliação editada" : "Avaliação registrada",
         `${currentUser.name} ${wasEdit ? "alterou" : "registrou"} notas e comentário na etapa atual.`,
       );
   };
+
 
   const classifyIdea: Ctx["classifyIdea"] = (ideaId, stageId, option) => {
     const idea = ideas.find((i) => i.id === ideaId);
