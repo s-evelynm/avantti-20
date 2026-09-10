@@ -69,6 +69,7 @@ function Index() {
                 <Link
                   to="/desafios/$challengeId"
                   params={{ challengeId: c.id }}
+                  search={{ aba: "visao" as const }}
                   className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3 hover:shadow-sm"
                 >
                   <span className="text-sm">{c.title}</span>

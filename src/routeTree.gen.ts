@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as ObjetivosRouteImport } from './routes/objetivos'
 import { Route as DesafiosIndexRouteImport } from './routes/desafios/index'
 import { Route as DesafiosChallengeIdRouteImport } from './routes/desafios/$challengeId'
@@ -23,6 +24,11 @@ import { Route as ProgramasNovoRouteImport } from './routes/programas/novo'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvaliacoesRoute = AvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObjetivosRoute = ObjetivosRouteImport.update({
@@ -73,6 +79,7 @@ const ProgramasNovoRoute = ProgramasNovoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/objetivos': typeof ObjetivosRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/objetivos': typeof ObjetivosRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/objetivos': typeof ObjetivosRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/avaliacoes'
     | '/objetivos'
     | '/desafios/$challengeId'
     | '/desafios/novo'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/avaliacoes'
     | '/objetivos'
     | '/desafios/$challengeId'
     | '/desafios/novo'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/avaliacoes'
     | '/objetivos'
     | '/desafios/$challengeId'
     | '/desafios/novo'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AvaliacoesRoute: typeof AvaliacoesRoute
   ObjetivosRoute: typeof ObjetivosRoute
   DesafiosChallengeIdRoute: typeof DesafiosChallengeIdRoute
   DesafiosNovoRoute: typeof DesafiosNovoRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avaliacoes': {
+      id: '/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/avaliacoes'
+      preLoaderRoute: typeof AvaliacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/objetivos': {
@@ -237,6 +257,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AvaliacoesRoute: AvaliacoesRoute,
   ObjetivosRoute: ObjetivosRoute,
   DesafiosChallengeIdRoute: DesafiosChallengeIdRoute,
   DesafiosNovoRoute: DesafiosNovoRoute,

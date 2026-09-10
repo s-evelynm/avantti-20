@@ -52,6 +52,7 @@ function ProgramasPage() {
               <Link
                 to="/programas/$programId"
                 params={{ programId: p.id }}
+                search={{ aba: "visao" as const }}
                 className="block h-full rounded-xl border border-l-[3px] border-l-primary bg-card p-4 hover:shadow-sm"
               >
                 <h3 className="font-semibold text-primary">{p.name}</h3>

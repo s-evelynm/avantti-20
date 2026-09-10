@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/AppLayout";
+import {
+  Breadcrumbs,
+  CrumbSeparator,
+  CurrentCrumb,
+  PageHeader,
+  crumbLinkClass,
+} from "@/components/AppLayout";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +30,12 @@ import {
 import { useApp, formatMoney } from "@/lib/store";
 import type { AudienceMode } from "@/lib/types";
 
+type Aba = "visao" | "desafios" | "configuracao";
+
 export const Route = createFileRoute("/programas/$programId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    aba: ((s["aba"] as Aba) || "visao") as Aba,
+  }),
   head: () => ({
     meta: [
       { title: "Programa — Avantti" },
@@ -41,13 +52,14 @@ export const Route = createFileRoute("/programas/$programId")({
 
 function ProgramaDetalhe() {
   const { programId } = Route.useParams();
+  const { aba } = Route.useSearch();
   const navigate = useNavigate();
   const {
     programs,
     challenges,
     users,
     areas,
-    role,
+    caps,
     updateProgram,
     deleteProgram,
     logsFor,
@@ -66,7 +78,7 @@ function ProgramaDetalhe() {
       </div>
     );
 
-  const isAdmin = role === "admin";
+  const isAdmin = caps.configurar;
   const programChallenges = challenges.filter((c) => c.programId === program.id);
   const eligible = users.filter((u) =>
     program.audience.mode === "todos"
@@ -85,10 +97,19 @@ function ProgramaDetalhe() {
         mode === "todos" ? "Todos" : mode === "areas" ? `áreas (${next.areas.join(", ") || "nenhuma"})` : `usuários específicos (${next.userIds.length})`
       }.`,
     );
+    toast.success("Público elegível atualizado");
   };
 
   return (
     <div>
+      <Breadcrumbs>
+        <Link to="/programas" className={crumbLinkClass}>
+          Programas
+        </Link>
+        <CrumbSeparator />
+        <CurrentCrumb label={program.name} />
+      </Breadcrumbs>
+
       <PageHeader
         title={program.name}
         description={program.context}
@@ -100,7 +121,7 @@ function ProgramaDetalhe() {
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline">Excluir</Button>
+                  <Button variant="ghost">Excluir</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -130,7 +151,7 @@ function ProgramaDetalhe() {
       />
 
       {editing && isAdmin && (
-        <div className="mb-6 space-y-4 rounded-xl border bg-card p-4">
+        <div className="mb-8 space-y-4 rounded-xl border bg-card p-4">
           <div>
             <Label className="label-caps">Nome</Label>
             <Input id="p-name" defaultValue={program.name} />
@@ -177,16 +198,38 @@ function ProgramaDetalhe() {
         </div>
       )}
 
-      <Tabs defaultValue="desafios">
+      <Tabs
+        value={aba}
+        onValueChange={(v) => navigate({ to: ".", search: { aba: v as Aba }, replace: true })}
+      >
         <TabsList>
+          <TabsTrigger value="visao">Visão geral</TabsTrigger>
           <TabsTrigger value="desafios">Desafios ({programChallenges.length})</TabsTrigger>
-          <TabsTrigger value="recurso">Recurso</TabsTrigger>
-          <TabsTrigger value="publico">Público elegível</TabsTrigger>
-          <TabsTrigger value="funil">Funil de avaliação</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
+          <TabsTrigger value="configuracao">Configuração</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="desafios" className="mt-4">
+        <TabsContent value="visao" className="mt-6 space-y-6">
+          <div className="rounded-xl border bg-card p-4">
+            <p className="label-caps">Recurso do programa</p>
+            <p className="mt-2 text-2xl font-semibold text-primary">
+              {formatMoney(program.resourceAmount, program.resourceCurrency)}
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{program.resourceNote || "Sem observação."}</p>
+            {program.documentName && (
+              <p className="mt-4 text-sm">
+                <span className="label-caps">Documento anexado</span>
+                <br />
+                {program.documentName}
+              </p>
+            )}
+          </div>
+          <section>
+            <h2 className="mb-4">Histórico de alterações</h2>
+            <HistoryList entries={logsFor(program.id)} />
+          </section>
+        </TabsContent>
+
+        <TabsContent value="desafios" className="mt-6">
           {isAdmin && (
             <Button asChild className="mb-4">
               <Link to="/desafios/novo" search={{ programa: program.id }}>
@@ -200,11 +243,12 @@ function ProgramaDetalhe() {
                 <Link
                   to="/desafios/$challengeId"
                   params={{ challengeId: c.id }}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-l-[3px] border-l-primary bg-card p-3 hover:shadow-sm"
+                  search={{ aba: "visao" }}
+                  className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-l-[3px] border-l-primary bg-card p-4 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 >
                   <div>
                     <p className="text-sm font-medium">{c.title}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {c.kind === "pontual" ? "Pontual" : "Contínuo"} ·{" "}
                       {ideas.filter((i) => i.challengeId === c.id).length} ideia(s)
                     </p>
@@ -219,113 +263,92 @@ function ProgramaDetalhe() {
           </ul>
         </TabsContent>
 
-        <TabsContent value="recurso" className="mt-4">
-          <div className="rounded-xl border bg-card p-4">
-            <p className="label-caps">Recurso do programa</p>
-            <p className="mt-1 text-2xl font-semibold text-primary">
-              {formatMoney(program.resourceAmount, program.resourceCurrency)}
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">{program.resourceNote || "Sem observação."}</p>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Sem lógica de alocação ou consumo neste protótipo.
-            </p>
-            {program.documentName && (
-              <p className="mt-3 text-sm">
-                <span className="label-caps">Documento anexado</span>
-                <br />
-                {program.documentName}
-              </p>
+        <TabsContent value="configuracao" className="mt-6 space-y-6">
+          <section className="space-y-4">
+            <h2>Público elegível</h2>
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  ["todos", "Todos"],
+                  ["areas", "Por área/unidade"],
+                  ["usuarios", "Usuários específicos (privado)"],
+                ] as [AudienceMode, string][]
+              ).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  disabled={!isAdmin}
+                  onClick={() => setAudience(mode)}
+                  className={
+                    program.audience.mode === mode
+                      ? "rounded-full bg-primary-soft px-4 py-2 text-sm font-medium text-primary"
+                      : "rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60"
+                  }
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {program.audience.mode === "areas" && (
+              <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-3">
+                {areas.map((a) => (
+                  <label key={a} className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      disabled={!isAdmin}
+                      checked={program.audience.areas.includes(a)}
+                      onCheckedChange={(v) =>
+                        setAudience("areas", {
+                          areas: v
+                            ? [...program.audience.areas, a]
+                            : program.audience.areas.filter((x) => x !== a),
+                        })
+                      }
+                    />
+                    {a}
+                  </label>
+                ))}
+              </div>
             )}
-          </div>
-        </TabsContent>
 
-        <TabsContent value="publico" className="mt-4 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                ["todos", "Todos"],
-                ["areas", "Por área/unidade"],
-                ["usuarios", "Usuários específicos (privado)"],
-              ] as [AudienceMode, string][]
-            ).map(([mode, label]) => (
-              <button
-                key={mode}
-                disabled={!isAdmin}
-                onClick={() => setAudience(mode)}
-                className={
-                  program.audience.mode === mode
-                    ? "rounded-full bg-primary-soft px-3 py-1.5 text-sm font-medium text-primary"
-                    : "rounded-full border px-3 py-1.5 text-sm text-muted-foreground disabled:opacity-60"
-                }
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+            {program.audience.mode === "usuarios" && (
+              <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
+                {users.map((u) => (
+                  <label key={u.id} className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      disabled={!isAdmin}
+                      checked={program.audience.userIds.includes(u.id)}
+                      onCheckedChange={(v) =>
+                        setAudience("usuarios", {
+                          userIds: v
+                            ? [...program.audience.userIds, u.id]
+                            : program.audience.userIds.filter((x) => x !== u.id),
+                        })
+                      }
+                    />
+                    {u.name} <span className="text-xs text-muted-foreground">· {u.area}</span>
+                  </label>
+                ))}
+              </div>
+            )}
 
-          {program.audience.mode === "areas" && (
-            <div className="grid gap-2 rounded-xl border bg-card p-4 sm:grid-cols-3">
-              {areas.map((a) => (
-                <label key={a} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    disabled={!isAdmin}
-                    checked={program.audience.areas.includes(a)}
-                    onCheckedChange={(v) =>
-                      setAudience("areas", {
-                        areas: v
-                          ? [...program.audience.areas, a]
-                          : program.audience.areas.filter((x) => x !== a),
-                      })
-                    }
-                  />
-                  {a}
-                </label>
-              ))}
+            <div className="rounded-xl bg-primary-soft p-4 text-sm">
+              <p className="label-caps">Visibilidade em tempo real</p>
+              <p className="mt-2">
+                {eligible.length} pessoa(s) enxergam este programa: {eligible.map((u) => u.name).join(", ")}
+              </p>
             </div>
-          )}
+          </section>
 
-          {program.audience.mode === "usuarios" && (
-            <div className="grid gap-2 rounded-xl border bg-card p-4 sm:grid-cols-2">
-              {users.map((u) => (
-                <label key={u.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    disabled={!isAdmin}
-                    checked={program.audience.userIds.includes(u.id)}
-                    onCheckedChange={(v) =>
-                      setAudience("usuarios", {
-                        userIds: v
-                          ? [...program.audience.userIds, u.id]
-                          : program.audience.userIds.filter((x) => x !== u.id),
-                      })
-                    }
-                  />
-                  {u.name} <span className="text-xs text-muted-foreground">· {u.area}</span>
-                </label>
-              ))}
+          <section>
+            <h2 className="mb-4">Funil de avaliação</h2>
+            <div className="rounded-xl border border-dashed bg-card p-6 text-center">
+              <p className="label-caps">Reservado</p>
+              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+                A montagem de etapas, transições e regras de avaliação do programa entra no próximo
+                passo do protótipo.
+              </p>
             </div>
-          )}
-
-          <div className="rounded-xl bg-primary-soft p-4 text-sm">
-            <p className="label-caps">Visibilidade em tempo real</p>
-            <p className="mt-1">
-              {eligible.length} pessoa(s) enxergam este programa: {eligible.map((u) => u.name).join(", ")}
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="funil" className="mt-4">
-          <div className="rounded-xl border border-dashed bg-card p-6 text-center">
-            <p className="label-caps">Reservado</p>
-            <h3 className="mt-2 text-primary">Funil de avaliação</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-              Seção reservada no programa. A configuração de etapas, critérios e regras por desafio
-              será construída no épico 2.
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="historico" className="mt-4">
-          <HistoryList entries={logsFor(program.id)} />
+          </section>
         </TabsContent>
       </Tabs>
     </div>

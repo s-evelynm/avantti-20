@@ -79,7 +79,7 @@ function NovoDesafio() {
       origin,
     );
     toast.success("Desafio criado como Rascunho");
-    navigate({ to: "/desafios/$challengeId", params: { challengeId: c.id } });
+    navigate({ to: "/desafios/$challengeId", params: { challengeId: c.id }, search: { aba: "visao" } });
   };
 
   return (

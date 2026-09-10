@@ -54,7 +54,7 @@ function NovoPrograma() {
       origin,
     );
     toast.success("Programa criado");
-    navigate({ to: "/programas/$programId", params: { programId: p.id } });
+    navigate({ to: "/programas/$programId", params: { programId: p.id }, search: { aba: "visao" } });
   };
 
   return (

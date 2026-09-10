@@ -27,9 +27,18 @@ import type {
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
+export interface Capabilities {
+  participar: boolean;
+  avaliar: boolean;
+  gerenciar: boolean;
+  configurar: boolean;
+}
+
 interface Ctx {
   role: Role;
-  setRole: (r: Role) => void;
+  viewAsId: string;
+  setViewAs: (id: string) => void;
+  caps: Capabilities;
   currentUser: { id: string; name: string };
   areas: string[];
   users: typeof USERS;
@@ -38,18 +47,29 @@ interface Ctx {
   challenges: Challenge[];
   ideas: Idea[];
   logs: LogEntry[];
-  addProgram: (p: Omit<Program, "id" | "createdAt">, origin?: string) => Program;
+  addProgram: (p: Omit<Program, "id" | "createdAt" | "funnel">, origin?: string) => Program;
   updateProgram: (id: string, patch: Partial<Program>, what: string) => void;
   deleteProgram: (id: string) => void;
   addObjective: (o: Omit<Objective, "id">) => void;
   updateObjective: (id: string, patch: Partial<Objective>) => void;
   deleteObjective: (id: string) => void;
   objectiveInUse: (id: string) => boolean;
-  addChallenge: (c: Omit<Challenge, "id" | "createdAt" | "status">, origin?: string) => Challenge;
+  addChallenge: (
+    c: Omit<
+      Challenge,
+      "id" | "createdAt" | "status" | "criteria" | "stageConfigs" | "evaluatorPoolIds" | "committeeIds"
+    >,
+    origin?: string,
+  ) => Challenge;
   updateChallenge: (id: string, patch: Partial<Challenge>, what: string) => void;
   setChallengeStatus: (id: string, status: ChallengeStatus) => void;
   deleteChallenge: (id: string) => void;
-  addIdea: (i: Omit<Idea, "id" | "createdAt">) => void;
+  addIdea: (
+    i: Omit<
+      Idea,
+      "id" | "createdAt" | "stageHistory" | "assignments" | "evaluations" | "classifications"
+    >,
+  ) => void;
   logsFor: (entityId: string) => LogEntry[];
   visiblePrograms: (userId: string) => Program[];
 }
@@ -57,18 +77,17 @@ interface Ctx {
 const AppContext = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role>("admin");
+  const [viewAsId, setViewAs] = useState("u1");
   const [programs, setPrograms] = useState<Program[]>(seedPrograms);
   const [objectives, setObjectives] = useState<Objective[]>(seedObjectives);
   const [challenges, setChallenges] = useState<Challenge[]>(seedChallenges);
   const [ideas, setIdeas] = useState<Idea[]>(seedIdeas);
   const [logs, setLogs] = useState<LogEntry[]>(seedLogs);
 
-  const currentUser = useMemo(() => {
-    if (role === "admin") return { id: "u1", name: "Evelyn Monteiro" };
-    if (role === "gestor") return { id: "u2", name: "Rafael Andrade" };
-    return { id: "u3", name: "Camila Torres" };
-  }, [role]);
+  const viewer = USERS.find((u) => u.id === viewAsId) ?? USERS[0]!;
+  const role: Role = viewer.role;
+  const currentUser = useMemo(() => ({ id: viewer.id, name: viewer.name }), [viewer.id, viewer.name]);
+
 
   const log = useCallback(
     (entry: Omit<LogEntry, "id" | "at" | "actor">, actor: string) => {
@@ -81,7 +100,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const addProgram: Ctx["addProgram"] = (p, origin = "Criação manual do programa.") => {
-    const program: Program = { ...p, id: uid(), createdAt: new Date().toISOString() };
+    const program: Program = {
+      ...p,
+      id: uid(),
+      funnel: { stages: [], transitions: [] },
+      createdAt: new Date().toISOString(),
+    };
     setPrograms((prev) => [program, ...prev]);
     log(
       {
@@ -162,6 +186,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...c,
       id: uid(),
       status: "rascunho",
+      criteria: [],
+      stageConfigs: {},
+      evaluatorPoolIds: [],
+      committeeIds: [],
       createdAt: new Date().toISOString(),
     };
     setChallenges((prev) => [challenge, ...prev]);
@@ -220,7 +248,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addIdea: Ctx["addIdea"] = (i) => {
-    const idea: Idea = { ...i, id: uid(), createdAt: new Date().toISOString() };
+    const program = programs.find((p) => p.id === challenges.find((c) => c.id === i.challengeId)?.programId);
+    const firstStage = program?.funnel.stages[0];
+    const idea: Idea = {
+      ...i,
+      id: uid(),
+      createdAt: new Date().toISOString(),
+      currentStageId: firstStage?.id,
+      stageHistory: firstStage ? [{ stageId: firstStage.id, enteredAt: new Date().toISOString() }] : [],
+      assignments: {},
+      evaluations: [],
+      classifications: [],
+    };
     setIdeas((prev) => [idea, ...prev]);
     log(
       { entityType: "ideia", entityId: idea.challengeId, entityLabel: idea.title, action: "Ideia submetida", detail: "Submissão registrada com a estrutura atual do formulário." },
@@ -238,10 +277,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return p.audience.userIds.includes(userId);
     });
 
+  const caps: Capabilities = {
+    participar: visiblePrograms(viewer.id).length > 0,
+    avaliar: challenges.some(
+      (c) => c.evaluatorPoolIds.includes(viewer.id) || c.committeeIds.includes(viewer.id),
+    ),
+    gerenciar: role === "admin" || role === "gestor" || challenges.some((c) => c.ownerId === viewer.id),
+    configurar: role === "admin",
+  };
+
   const value: Ctx = {
     role,
-    setRole,
+    viewAsId,
+    setViewAs,
+    caps,
     currentUser,
+
     areas: AREAS,
     users: USERS,
     programs,
