@@ -100,7 +100,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const addProgram: Ctx["addProgram"] = (p, origin = "Criação manual do programa.") => {
-    const program: Program = { ...p, id: uid(), createdAt: new Date().toISOString() };
+    const program: Program = {
+      ...p,
+      id: uid(),
+      funnel: { stages: [], transitions: [] },
+      createdAt: new Date().toISOString(),
+    };
     setPrograms((prev) => [program, ...prev]);
     log(
       {
