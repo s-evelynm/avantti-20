@@ -284,6 +284,13 @@ function DesafioDetalhe() {
             )}
           </section>
 
+          {isAdmin && (
+            <section className="space-y-4">
+              <h2>Configuração de avaliação</h2>
+              <EvaluationSetup challengeId={challenge.id} />
+            </section>
+          )}
+
           <section>
             <h2 className="mb-4">Histórico de alterações</h2>
             <HistoryList entries={logsFor(challenge.id)} />
