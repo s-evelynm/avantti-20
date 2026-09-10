@@ -57,7 +57,7 @@ function MinhasIdeias() {
             <li key={idea.id} className="rounded-xl border bg-card p-5">
               <p className="text-base font-semibold text-foreground">{idea.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {challenge?.title} · enviada em {formatDate(idea.createdAt)}
+                {challenge?.title} · enviada em {formatDate(idea.createdAt.slice(0, 10))}
               </p>
 
               <ol className="mt-4 grid gap-x-4 gap-y-3" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
