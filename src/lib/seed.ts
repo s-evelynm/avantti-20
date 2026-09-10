@@ -10,6 +10,10 @@ import type {
   Program,
   StageConfig,
 } from "./types";
+import coverLogistica from "@/assets/cover-logistica.jpg";
+import coverFrota from "@/assets/cover-frota.jpg";
+import coverAtendimento from "@/assets/cover-atendimento.jpg";
+import coverNegocios from "@/assets/cover-negocios.jpg";
 
 export const AREAS = [
   "Tecnologia",
@@ -237,6 +241,7 @@ export const seedChallenges: Challenge[] = [
     title: "Como reduzir deslocamentos improdutivos das equipes de campo?",
     context:
       "Hoje 22% das visitas técnicas terminam sem solução por falta de peça ou informação prévia.",
+    coverUrl: coverLogistica,
     objectiveIds: ["o1", "o4"],
     formFields: [
       f("ff1", "Qual problema específico sua ideia resolve?", "longo", [], true),
@@ -258,6 +263,7 @@ export const seedChallenges: Challenge[] = [
     programId: "p1",
     title: "Manutenção preditiva na frota leve",
     context: "Buscamos formas de antecipar falhas mecânicas usando dados já coletados pela telemetria.",
+    coverUrl: coverFrota,
     objectiveIds: ["o1"],
     formFields: [f("ff4", "Quais dados sua solução utiliza?", "curto", [], true)],
     kind: "continuo",
@@ -273,6 +279,7 @@ export const seedChallenges: Challenge[] = [
     programId: "p2",
     title: "Atendimento digital sem espera",
     context: "Reduzir o tempo médio de primeira resposta nos canais digitais para menos de 2 minutos.",
+    coverUrl: coverAtendimento,
     objectiveIds: ["o2", "o3"],
     formFields: [
       f("ff5", "Como a ideia impacta o NPS?", "longo", [], true),
@@ -306,6 +313,7 @@ export const seedChallenges: Challenge[] = [
     programId: "p3",
     title: "Modelos de receita recorrente para serviços B2B",
     context: "Exploração confidencial de novas linhas de receita.",
+    coverUrl: coverNegocios,
     objectiveIds: ["o5"],
     formFields: [f("ff7", "Qual o mercado-alvo?", "curto", [], true)],
     kind: "pontual",
