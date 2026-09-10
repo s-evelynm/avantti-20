@@ -1,4 +1,4 @@
-export type Role = "admin" | "gestor" | "usuario";
+export type Role = "admin" | "gestor" | "usuario" | "avaliador" | "comite" | "sponsor";
 
 export type FieldType = "curto" | "longo" | "unica" | "multipla";
 
@@ -25,6 +25,33 @@ export interface Audience {
   userIds: string[];
 }
 
+/* ---------- Épico 2: funil de avaliação (pertence ao programa) ---------- */
+
+export type StageMechanism = "nota" | "classificacao" | "gate" | "revisao";
+
+export interface FunnelStage {
+  id: string;
+  name: string;
+  mechanism: StageMechanism;
+  readiness: string;
+  ownerId: string;
+  defaultDays: number;
+  /** usado quando mechanism === "classificacao" */
+  classificationOptions: string[];
+}
+
+export interface FunnelTransition {
+  id: string;
+  fromId: string;
+  toId: string;
+  condition: string;
+}
+
+export interface Funnel {
+  stages: FunnelStage[];
+  transitions: FunnelTransition[];
+}
+
 export interface Program {
   id: string;
   name: string;
@@ -34,6 +61,7 @@ export interface Program {
   resourceCurrency: string;
   resourceNote: string;
   audience: Audience;
+  funnel: Funnel;
   createdAt: string;
 }
 
@@ -44,6 +72,23 @@ export interface Objective {
 }
 
 export type ChallengeStatus = "rascunho" | "aberto" | "pausado" | "encerrado";
+
+/** critério de avaliação: por desafio e por etapa de mecanismo "nota" */
+export interface Criterion {
+  id: string;
+  stageId: string;
+  name: string;
+  weight: number;
+  scaleMax: number;
+}
+
+export type Consolidation = "media" | "ponderada" | "individual";
+
+export interface StageConfig {
+  consolidation: Consolidation;
+  evaluatorsNeeded: number;
+  vehicle: string;
+}
 
 export interface Challenge {
   id: string;
@@ -57,6 +102,54 @@ export interface Challenge {
   ownerId: string;
   status: ChallengeStatus;
   createdAt: string;
+  /* Épico 2 */
+  criteria: Criterion[];
+  stageConfigs: Record<string, StageConfig>;
+  evaluatorPoolIds: string[];
+  committeeIds: string[];
+}
+
+export interface StageVisit {
+  stageId: string;
+  enteredAt: string;
+  exitedAt?: string | undefined;
+  movedBy?: string | undefined;
+}
+
+export interface Evaluation {
+  id: string;
+  stageId: string;
+  evaluatorId: string;
+  scores: Record<string, number>;
+  comment: string;
+  createdAt: string;
+  updatedAt?: string | undefined;
+  edited: boolean;
+  locked: boolean;
+}
+
+export interface ClassificationResult {
+  stageId: string;
+  option: string;
+  byId: string;
+  at: string;
+}
+
+export interface Decision {
+  result: "aprovada" | "reprovada";
+  justification: string;
+  byId: string;
+  at: string;
+  /** ata formal, sempre gerada */
+  minutes: string;
+}
+
+export interface Feedback {
+  message: string;
+  origin: "manual" | "ia";
+  approved: boolean;
+  approvedBy?: string | undefined;
+  approvedAt?: string | undefined;
 }
 
 export interface Idea {
@@ -70,6 +163,15 @@ export interface Idea {
   formSnapshot: FormField[];
   authorId: string;
   createdAt: string;
+  /* Épico 2 */
+  currentStageId?: string | undefined;
+  stageHistory: StageVisit[];
+  /** distribuição: avaliadores designados por etapa */
+  assignments: Record<string, string[]>;
+  evaluations: Evaluation[];
+  classifications: ClassificationResult[];
+  decision?: Decision | undefined;
+  feedback?: Feedback | undefined;
 }
 
 export interface LogEntry {
