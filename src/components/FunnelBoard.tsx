@@ -30,6 +30,13 @@ import {
   stageConfigOf,
 } from "@/lib/evaluation";
 import { aiFeedbackFromEvaluations } from "@/lib/ai-mock";
+import { SuggestionTag } from "@/components/SuggestionTag";
+import {
+  duplicateOf,
+  namesOf,
+  suggestEvaluators,
+  triageChecklist,
+} from "@/lib/triage";
 import type { Idea } from "@/lib/types";
 
 export function FunnelBoard({ challengeId }: { challengeId: string }) {
@@ -73,6 +80,8 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
               <ul className="mt-3 space-y-2">
                 {cards.map((idea) => {
                   const ready = isReady(challenge, stage, idea);
+                  const triage = funnel.stages[0]?.id === stage.id ? triageChecklist(idea) : null;
+                  const dup = triage ? duplicateOf(idea.id) : null;
                   return (
                     <li key={idea.id}>
                       <button
@@ -83,11 +92,23 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
                         <p className="mt-1 text-xs text-muted-foreground">
                           {users.find((u) => u.id === idea.authorId)?.name ?? "Anônimo"}
                         </p>
-                        {ready && (
-                          <span className="mt-2 inline-block rounded-full bg-success-bg px-2 py-1 text-xs text-success">
-                            Pronto para avançar
-                          </span>
-                        )}
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {ready && (
+                            <span className="rounded-full bg-success-bg px-2 py-1 text-xs text-success">
+                              Pronto para avançar
+                            </span>
+                          )}
+                          {triage && (
+                            <span className="rounded-full bg-muted px-2 py-1 text-xs">
+                              {triage.okCount} de {triage.total} ok
+                            </span>
+                          )}
+                          {dup && (
+                            <span className="rounded-full bg-warning-bg px-2 py-1 text-xs text-warning">
+                              possível duplicata
+                            </span>
+                          )}
+                        </div>
                       </button>
                     </li>
                   );
@@ -115,6 +136,7 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
 function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
   const {
     challenges,
+    ideas: allIdeas,
     users,
     currentUser,
     funnelOfChallenge,
@@ -141,6 +163,20 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
 
   const author = users.find((u) => u.id === idea.authorId)?.name ?? "Autor";
 
+  /* triagem: primeira etapa do funil */
+  const isTriage = !!stage && funnel.stages[0]?.id === stage.id;
+  const checklist = triageChecklist(idea);
+  const duplicateId = duplicateOf(idea.id);
+  const duplicate = allIdeas.find((i) => i.id === duplicateId) ?? null;
+  const [duplicateStatus, setDuplicateStatus] = useState<"aberto" | "mantida" | "duplicata" | "ignorado">(
+    "aberto",
+  );
+  const [comparing, setComparing] = useState(false);
+
+  const suggestion = stage
+    ? suggestEvaluators(idea, challenge.evaluatorPoolIds, allIdeas, cfg?.evaluatorsNeeded ?? 1)
+    : null;
+
   return (
     <>
       <DialogHeader>
@@ -153,12 +189,147 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
       <div className="space-y-6">
         <p className="text-sm text-muted-foreground">{idea.description}</p>
 
+        {isTriage && duplicate && duplicateStatus !== "ignorado" && (
+          <section className="rounded-xl border border-warning/40 bg-warning-bg p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-medium text-warning">
+                Pode ser parecida com “{duplicate.title}”
+              </p>
+              <SuggestionTag />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Aviso de possível duplicidade. Você decide o que fazer com a ideia.
+            </p>
+            {comparing && (
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {[idea, duplicate].map((it) => (
+                  <div key={it.id} className="rounded-lg border bg-card p-3">
+                    <p className="text-sm font-medium">{it.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {users.find((u) => u.id === it.authorId)?.name ?? "Autor"} ·{" "}
+                      {formatDateTime(it.createdAt)}
+                    </p>
+                    <p className="mt-2 text-xs">{it.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => setComparing((v) => !v)}>
+                {comparing ? "Fechar comparação" : "Comparar as duas"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setDuplicateStatus("mantida");
+                  toast.success("Ideia mantida como original");
+                }}
+              >
+                Manter
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setDuplicateStatus("duplicata");
+                  toast.success("Marcada como duplicata");
+                }}
+              >
+                Marcar como duplicata
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setDuplicateStatus("ignorado")}>
+                Ignorar aviso
+              </Button>
+            </div>
+            {duplicateStatus !== "aberto" && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Situação registrada: {duplicateStatus === "mantida" ? "mantida" : "duplicata"}.
+              </p>
+            )}
+          </section>
+        )}
+
+        {isTriage && (
+          <section className="rounded-xl border bg-card p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="label-caps">Checklist de triagem</p>
+              <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium">
+                {checklist.summary}
+              </span>
+            </div>
+            <ul className="mt-3 space-y-2 text-sm">
+              {checklist.items.map((item) => (
+                <li key={item.label} className="flex items-start gap-2 rounded-lg border p-3">
+                  <span
+                    className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
+                      item.ok ? "bg-success-bg text-success" : "bg-warning-bg text-warning"
+                    }`}
+                    aria-hidden
+                  >
+                    {item.ok ? "✓" : "!"}
+                  </span>
+                  <div>
+                    <p className="flex flex-wrap items-center gap-2 font-medium">
+                      {item.label}
+                      {item.simulated && <SuggestionTag />}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Aderência baixa não reprova a ideia sozinha — é só um alerta. A decisão de avançar ou
+              reprovar continua sendo sua.
+            </p>
+          </section>
+        )}
+
         {stage && (
           <section className="rounded-xl border bg-card p-4">
             <p className="label-caps">Distribuição desta etapa</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Escolha entre o pool de avaliadores elegíveis do desafio.
             </p>
+
+            {suggestion && suggestion.suggestedIds.length > 0 && (
+              <div className="mt-3 rounded-lg border border-dashed p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-medium">
+                    Sugestão: {namesOf(users, suggestion.suggestedIds).join(" e ")}
+                  </p>
+                  <SuggestionTag />
+                </div>
+                {suggestion.byTheme.length > 0 && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Combina com o tema (sugestão): {namesOf(users, suggestion.byTheme).join(", ")}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Menor fila agora (calculado):{" "}
+                  {suggestion.byWorkload
+                    .slice(0, 3)
+                    .map(
+                      (w) =>
+                        `${users.find((u) => u.id === w.id)?.name.split(" ")[0] ?? w.id} (${w.open})`,
+                    )
+                    .join(" · ") || "—"}
+                </p>
+                <Button
+                  className="mt-3"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    assignEvaluators(idea.id, stage.id, suggestion.suggestedIds);
+                    toast.success("Sugestão aplicada — confirme ou troque quem avalia");
+                  }}
+                >
+                  Usar sugestão
+                </Button>
+              </div>
+            )}
+
             <div className="mt-3 space-y-2">
               {challenge.evaluatorPoolIds.map((id) => (
                 <label key={id} className="flex items-center gap-2 text-sm">
