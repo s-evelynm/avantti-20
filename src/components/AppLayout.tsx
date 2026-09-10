@@ -1,5 +1,14 @@
 import { Link, useRouterState, type LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import {
+  Target,
+  Lightbulb,
+  ClipboardCheck,
+  LayoutGrid,
+  Building2,
+  Flag,
+  type LucideIcon,
+} from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
@@ -13,7 +22,9 @@ import {
 interface NavItem {
   to: LinkProps["to"];
   label: string;
+  icon: LucideIcon;
   exact?: boolean;
+  badge?: number;
 }
 
 interface NavSection {
@@ -22,27 +33,53 @@ interface NavSection {
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { users, viewAsId, setViewAs, caps, role } = useApp();
+  const { users, viewAsId, setViewAs, caps, role, ideas, challenges, currentUser, funnelOfChallenge } =
+    useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const pendentes = ideas.filter((idea) => {
+    if (!idea.currentStageId) return false;
+    const challenge = challenges.find((c) => c.id === idea.challengeId);
+    if (!challenge) return false;
+    const stage = funnelOfChallenge(idea.challengeId).stages.find((s) => s.id === idea.currentStageId);
+    if (!stage) return false;
+    if (!(idea.assignments[stage.id] ?? []).includes(currentUser.id)) return false;
+    return !idea.evaluations.some((e) => e.stageId === stage.id && e.evaluatorId === currentUser.id);
+  }).length;
 
   const sections: NavSection[] = [];
   if (caps.participar)
-    sections.push({ title: "Participar", items: [{ to: "/explorar", label: "Desafios abertos" }] });
+    sections.push({
+      title: "Participar",
+      items: [
+        { to: "/explorar", label: "Desafios", icon: Target },
+        { to: "/minhas-ideias", label: "Minhas ideias", icon: Lightbulb },
+      ],
+    });
   if (caps.avaliar)
-    sections.push({ title: "Avaliar", items: [{ to: "/avaliacoes", label: "Minhas avaliações" }] });
+    sections.push({
+      title: "Avaliar",
+      items: [
+        {
+          to: "/avaliacoes",
+          label: "Minhas avaliações",
+          icon: ClipboardCheck,
+          ...(pendentes > 0 ? { badge: pendentes } : {}),
+        },
+      ],
+    });
   if (caps.gerenciar)
     sections.push({
-      title: "Gerenciar",
-      items: [
-        { to: "/", label: "Visão geral", exact: true },
-        { to: "/programas", label: "Programas" },
-        { to: "/desafios", label: "Desafios" },
-      ],
+      title: "Acompanhar",
+      items: [{ to: "/painel", label: "Painel", icon: LayoutGrid }],
     });
   if (caps.configurar)
     sections.push({
       title: "Configurar",
-      items: [{ to: "/objetivos", label: "Objetivos estratégicos" }],
+      items: [
+        { to: "/programas", label: "Programas", icon: Building2 },
+        { to: "/objetivos", label: "Objetivos estratégicos", icon: Flag },
+      ],
     });
 
   const roleLabel: Record<string, string> = {
@@ -57,7 +94,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background lg:flex">
       <aside className="border-b bg-card lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:border-r lg:border-b-0">
-        <div className="flex h-16 items-center px-4">
+        <div className="flex h-16 items-center px-6">
           <Link
             to="/"
             className="rounded-md text-lg font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
@@ -65,27 +102,34 @@ export function AppLayout({ children }: { children: ReactNode }) {
             Avantti
           </Link>
         </div>
-        <nav className="space-y-6 px-4 pb-6">
+        <nav className="space-y-6 px-3 pb-6">
           {sections.map((s) => (
             <div key={s.title}>
-              <p className="label-caps px-2 text-muted-foreground">{s.title}</p>
+              <p className="label-caps px-3 text-muted-foreground">{s.title}</p>
               <ul className="mt-2 space-y-1">
                 {s.items.map((n) => {
                   const path = String(n.to);
                   const active = n.exact ? pathname === path : pathname.startsWith(path);
+                  const Icon = n.icon;
                   return (
                     <li key={path}>
                       <Link
                         to={path}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "block rounded-md px-2 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                           active
                             ? "bg-primary-soft font-medium text-primary"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground",
                         )}
                       >
-                        {n.label}
+                        <Icon className="size-4 shrink-0" aria-hidden />
+                        <span className="truncate">{n.label}</span>
+                        {n.badge ? (
+                          <span className="ml-auto rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary">
+                            {n.badge}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   );

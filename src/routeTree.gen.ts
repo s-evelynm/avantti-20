@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MinhasIdeiasRouteImport } from './routes/minhas-ideias'
 import { Route as ObjetivosRouteImport } from './routes/objetivos'
 import { Route as AvaliacoesIndexRouteImport } from './routes/avaliacoes/index'
 import { Route as AvaliacoesIdeaIdRouteImport } from './routes/avaliacoes/$ideaId'
@@ -18,6 +19,8 @@ import { Route as DesafiosChallengeIdRouteImport } from './routes/desafios/$chal
 import { Route as DesafiosNovoRouteImport } from './routes/desafios/novo'
 import { Route as ExplorarIndexRouteImport } from './routes/explorar/index'
 import { Route as ExplorarChallengeIdRouteImport } from './routes/explorar/$challengeId'
+import { Route as PainelIndexRouteImport } from './routes/painel/index'
+import { Route as PainelChallengeIdRouteImport } from './routes/painel/$challengeId'
 import { Route as ProgramasIndexRouteImport } from './routes/programas/index'
 import { Route as ProgramasProgramIdRouteImport } from './routes/programas/$programId'
 import { Route as ProgramasNovoRouteImport } from './routes/programas/novo'
@@ -25,6 +28,11 @@ import { Route as ProgramasNovoRouteImport } from './routes/programas/novo'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhasIdeiasRoute = MinhasIdeiasRouteImport.update({
+  id: '/minhas-ideias',
+  path: '/minhas-ideias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObjetivosRoute = ObjetivosRouteImport.update({
@@ -67,6 +75,16 @@ const ExplorarChallengeIdRoute = ExplorarChallengeIdRouteImport.update({
   path: '/explorar/$challengeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelIndexRoute = PainelIndexRouteImport.update({
+  id: '/painel/',
+  path: '/painel/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelChallengeIdRoute = PainelChallengeIdRouteImport.update({
+  id: '/painel/$challengeId',
+  path: '/painel/$challengeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
   id: '/programas/',
   path: '/programas/',
@@ -85,104 +103,125 @@ const ProgramasNovoRoute = ProgramasNovoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/minhas-ideias': typeof MinhasIdeiasRoute
   '/objetivos': typeof ObjetivosRoute
   '/avaliacoes/$ideaId': typeof AvaliacoesIdeaIdRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
   '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/painel/$challengeId': typeof PainelChallengeIdRoute
   '/programas/$programId': typeof ProgramasProgramIdRoute
   '/programas/novo': typeof ProgramasNovoRoute
   '/avaliacoes/': typeof AvaliacoesIndexRoute
   '/desafios/': typeof DesafiosIndexRoute
   '/explorar/': typeof ExplorarIndexRoute
+  '/painel/': typeof PainelIndexRoute
   '/programas/': typeof ProgramasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/minhas-ideias': typeof MinhasIdeiasRoute
   '/objetivos': typeof ObjetivosRoute
   '/avaliacoes/$ideaId': typeof AvaliacoesIdeaIdRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
   '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/painel/$challengeId': typeof PainelChallengeIdRoute
   '/programas/$programId': typeof ProgramasProgramIdRoute
   '/programas/novo': typeof ProgramasNovoRoute
   '/avaliacoes': typeof AvaliacoesIndexRoute
   '/desafios': typeof DesafiosIndexRoute
   '/explorar': typeof ExplorarIndexRoute
+  '/painel': typeof PainelIndexRoute
   '/programas': typeof ProgramasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/minhas-ideias': typeof MinhasIdeiasRoute
   '/objetivos': typeof ObjetivosRoute
   '/avaliacoes/$ideaId': typeof AvaliacoesIdeaIdRoute
   '/desafios/$challengeId': typeof DesafiosChallengeIdRoute
   '/desafios/novo': typeof DesafiosNovoRoute
   '/explorar/$challengeId': typeof ExplorarChallengeIdRoute
+  '/painel/$challengeId': typeof PainelChallengeIdRoute
   '/programas/$programId': typeof ProgramasProgramIdRoute
   '/programas/novo': typeof ProgramasNovoRoute
   '/avaliacoes/': typeof AvaliacoesIndexRoute
   '/desafios/': typeof DesafiosIndexRoute
   '/explorar/': typeof ExplorarIndexRoute
+  '/painel/': typeof PainelIndexRoute
   '/programas/': typeof ProgramasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/minhas-ideias'
     | '/objetivos'
     | '/avaliacoes/$ideaId'
     | '/desafios/$challengeId'
     | '/desafios/novo'
     | '/explorar/$challengeId'
+    | '/painel/$challengeId'
     | '/programas/$programId'
     | '/programas/novo'
     | '/avaliacoes/'
     | '/desafios/'
     | '/explorar/'
+    | '/painel/'
     | '/programas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/minhas-ideias'
     | '/objetivos'
     | '/avaliacoes/$ideaId'
     | '/desafios/$challengeId'
     | '/desafios/novo'
     | '/explorar/$challengeId'
+    | '/painel/$challengeId'
     | '/programas/$programId'
     | '/programas/novo'
     | '/avaliacoes'
     | '/desafios'
     | '/explorar'
+    | '/painel'
     | '/programas'
   id:
     | '__root__'
     | '/'
+    | '/minhas-ideias'
     | '/objetivos'
     | '/avaliacoes/$ideaId'
     | '/desafios/$challengeId'
     | '/desafios/novo'
     | '/explorar/$challengeId'
+    | '/painel/$challengeId'
     | '/programas/$programId'
     | '/programas/novo'
     | '/avaliacoes/'
     | '/desafios/'
     | '/explorar/'
+    | '/painel/'
     | '/programas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MinhasIdeiasRoute: typeof MinhasIdeiasRoute
   ObjetivosRoute: typeof ObjetivosRoute
   AvaliacoesIdeaIdRoute: typeof AvaliacoesIdeaIdRoute
   DesafiosChallengeIdRoute: typeof DesafiosChallengeIdRoute
   DesafiosNovoRoute: typeof DesafiosNovoRoute
   ExplorarChallengeIdRoute: typeof ExplorarChallengeIdRoute
+  PainelChallengeIdRoute: typeof PainelChallengeIdRoute
   ProgramasProgramIdRoute: typeof ProgramasProgramIdRoute
   ProgramasNovoRoute: typeof ProgramasNovoRoute
   AvaliacoesIndexRoute: typeof AvaliacoesIndexRoute
   DesafiosIndexRoute: typeof DesafiosIndexRoute
   ExplorarIndexRoute: typeof ExplorarIndexRoute
+  PainelIndexRoute: typeof PainelIndexRoute
   ProgramasIndexRoute: typeof ProgramasIndexRoute
 }
 
@@ -193,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minhas-ideias': {
+      id: '/minhas-ideias'
+      path: '/minhas-ideias'
+      fullPath: '/minhas-ideias'
+      preLoaderRoute: typeof MinhasIdeiasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/objetivos': {
@@ -251,6 +297,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExplorarChallengeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel/': {
+      id: '/painel/'
+      path: '/painel'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof PainelIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/$challengeId': {
+      id: '/painel/$challengeId'
+      path: '/painel/$challengeId'
+      fullPath: '/painel/$challengeId'
+      preLoaderRoute: typeof PainelChallengeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programas/': {
       id: '/programas/'
       path: '/programas'
@@ -277,16 +337,19 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MinhasIdeiasRoute: MinhasIdeiasRoute,
   ObjetivosRoute: ObjetivosRoute,
   AvaliacoesIdeaIdRoute: AvaliacoesIdeaIdRoute,
   DesafiosChallengeIdRoute: DesafiosChallengeIdRoute,
   DesafiosNovoRoute: DesafiosNovoRoute,
   ExplorarChallengeIdRoute: ExplorarChallengeIdRoute,
+  PainelChallengeIdRoute: PainelChallengeIdRoute,
   ProgramasProgramIdRoute: ProgramasProgramIdRoute,
   ProgramasNovoRoute: ProgramasNovoRoute,
   AvaliacoesIndexRoute: AvaliacoesIndexRoute,
   DesafiosIndexRoute: DesafiosIndexRoute,
   ExplorarIndexRoute: ExplorarIndexRoute,
+  PainelIndexRoute: PainelIndexRoute,
   ProgramasIndexRoute: ProgramasIndexRoute,
 }
 export const routeTree = rootRouteImport
