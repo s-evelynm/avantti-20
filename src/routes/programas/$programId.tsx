@@ -8,6 +8,8 @@ import {
   PageHeader,
   crumbLinkClass,
 } from "@/components/AppLayout";
+import { FunnelBuilder } from "@/components/FunnelBuilder";
+import { mechanismLabel } from "@/lib/evaluation";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";

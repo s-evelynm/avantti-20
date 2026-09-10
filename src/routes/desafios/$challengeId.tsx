@@ -9,6 +9,8 @@ import {
   crumbLinkClass,
 } from "@/components/AppLayout";
 import { FormBuilder } from "@/components/FormBuilder";
+import { FunnelBoard } from "@/components/FunnelBoard";
+import { EvaluationSetup } from "@/components/EvaluationSetup";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
