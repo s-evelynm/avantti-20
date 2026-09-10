@@ -1,11 +1,14 @@
 import type {
   AppUser,
   Challenge,
+  Criterion,
   FormField,
+  Funnel,
   Idea,
   LogEntry,
   Objective,
   Program,
+  StageConfig,
 } from "./types";
 
 export const AREAS = [
@@ -23,9 +26,9 @@ export const USERS: AppUser[] = [
   { id: "u2", name: "Rafael Andrade", area: "Operações", role: "gestor" },
   { id: "u3", name: "Camila Torres", area: "Comercial", role: "usuario" },
   { id: "u4", name: "Bruno Salgado", area: "Tecnologia", role: "usuario" },
-  { id: "u5", name: "Larissa Pinho", area: "Recursos Humanos", role: "usuario" },
-  { id: "u6", name: "Diego Ferraz", area: "Financeiro", role: "gestor" },
-  { id: "u7", name: "Marina Bastos", area: "Marketing", role: "usuario" },
+  { id: "u5", name: "Larissa Pinho", area: "Recursos Humanos", role: "avaliador" },
+  { id: "u6", name: "Diego Ferraz", area: "Financeiro", role: "comite" },
+  { id: "u7", name: "Marina Bastos", area: "Marketing", role: "avaliador" },
 ];
 
 export const FIXED_FIELDS_NOTE =
@@ -39,6 +42,114 @@ const f = (id: string, label: string, type: FormField["type"], options: string[]
   required,
 });
 
+const funnelP1: Funnel = {
+  stages: [
+    {
+      id: "s1",
+      name: "Triagem inicial",
+      mechanism: "gate",
+      readiness: "Gestor confirmou aderência da ideia ao desafio",
+      ownerId: "u2",
+      defaultDays: 3,
+      classificationOptions: [],
+    },
+    {
+      id: "s2",
+      name: "Avaliação técnica",
+      mechanism: "nota",
+      readiness: "3 de 3 avaliadores concluíram",
+      ownerId: "u2",
+      defaultDays: 7,
+      classificationOptions: [],
+    },
+    {
+      id: "s3",
+      name: "Classificação",
+      mechanism: "classificacao",
+      readiness: "Comitê registrou a classificação",
+      ownerId: "u1",
+      defaultDays: 5,
+      classificationOptions: ["Quick win", "Projeto"],
+    },
+    {
+      id: "s4",
+      name: "Refinamento",
+      mechanism: "revisao",
+      readiness: "Autor entregou a versão revisada",
+      ownerId: "u2",
+      defaultDays: 10,
+      classificationOptions: [],
+    },
+    {
+      id: "s5",
+      name: "Comitê decisor",
+      mechanism: "gate",
+      readiness: "Comitê deliberou e registrou a decisão",
+      ownerId: "u1",
+      defaultDays: 7,
+      classificationOptions: [],
+    },
+  ],
+  transitions: [
+    { id: "t1", fromId: "s1", toId: "s2", condition: "" },
+    { id: "t2", fromId: "s2", toId: "s3", condition: "" },
+    { id: "t3", fromId: "s3", toId: "s4", condition: 'Classificação = "Projeto"' },
+    { id: "t4", fromId: "s3", toId: "s5", condition: 'Classificação = "Quick win"' },
+    { id: "t5", fromId: "s4", toId: "s5", condition: "" },
+  ],
+};
+
+const funnelP2: Funnel = {
+  stages: [
+    {
+      id: "e1",
+      name: "Triagem",
+      mechanism: "gate",
+      readiness: "Ideia revisada pelo time de experiência",
+      ownerId: "u6",
+      defaultDays: 2,
+      classificationOptions: [],
+    },
+    {
+      id: "e2",
+      name: "Avaliação de impacto",
+      mechanism: "nota",
+      readiness: "2 de 2 avaliadores concluíram",
+      ownerId: "u6",
+      defaultDays: 5,
+      classificationOptions: [],
+    },
+    {
+      id: "e3",
+      name: "Decisão",
+      mechanism: "gate",
+      readiness: "Comitê deliberou",
+      ownerId: "u1",
+      defaultDays: 5,
+      classificationOptions: [],
+    },
+  ],
+  transitions: [
+    { id: "te1", fromId: "e1", toId: "e2", condition: "" },
+    { id: "te2", fromId: "e2", toId: "e3", condition: "" },
+  ],
+};
+
+const funnelP3: Funnel = {
+  stages: [
+    {
+      id: "x1",
+      name: "Análise executiva",
+      mechanism: "revisao",
+      readiness: "Parecer do comitê executivo registrado",
+      ownerId: "u1",
+      defaultDays: 15,
+      classificationOptions: [],
+    },
+  ],
+  transitions: [],
+};
+
 export const seedPrograms: Program[] = [
   {
     id: "p1",
@@ -50,6 +161,7 @@ export const seedPrograms: Program[] = [
     resourceCurrency: "BRL",
     resourceNote: "Verba aprovada pelo comitê para pilotos e provas de conceito.",
     audience: { mode: "areas", areas: ["Operações", "Tecnologia"], userIds: [] },
+    funnel: funnelP1,
     createdAt: "2026-01-12T13:00:00.000Z",
   },
   {
@@ -61,6 +173,7 @@ export const seedPrograms: Program[] = [
     resourceCurrency: "BRL",
     resourceNote: "Recurso destinado a experimentos rápidos de até 90 dias.",
     audience: { mode: "todos", areas: [], userIds: [] },
+    funnel: funnelP2,
     createdAt: "2026-02-03T13:00:00.000Z",
   },
   {
@@ -72,6 +185,7 @@ export const seedPrograms: Program[] = [
     resourceCurrency: "BRL",
     resourceNote: "Uso sujeito a aprovação do comitê executivo.",
     audience: { mode: "usuarios", areas: [], userIds: ["u1", "u2", "u6"] },
+    funnel: funnelP3,
     createdAt: "2026-02-20T13:00:00.000Z",
   },
 ];
@@ -83,6 +197,38 @@ export const seedObjectives: Objective[] = [
   { id: "o4", name: "Sustentabilidade", description: "Reduzir emissões e desperdício de materiais." },
   { id: "o5", name: "Novas fontes de receita", description: "Explorar modelos de negócio adjacentes." },
 ];
+
+const critC1: Criterion[] = [
+  { id: "cr1", stageId: "s2", name: "Impacto no custo", weight: 40, scaleMax: 10 },
+  { id: "cr2", stageId: "s2", name: "Viabilidade técnica", weight: 35, scaleMax: 10 },
+  { id: "cr3", stageId: "s2", name: "Originalidade", weight: 25, scaleMax: 10 },
+];
+
+const cfgC1: Record<string, StageConfig> = {
+  s1: { consolidation: "media", evaluatorsNeeded: 1, vehicle: "Checagem interna do gestor" },
+  s2: { consolidation: "ponderada", evaluatorsNeeded: 3, vehicle: "Formulário online + reunião de calibração" },
+  s3: { consolidation: "individual", evaluatorsNeeded: 1, vehicle: "Reunião do comitê de classificação" },
+  s4: { consolidation: "media", evaluatorsNeeded: 1, vehicle: "Sessão de refinamento com o autor" },
+  s5: { consolidation: "media", evaluatorsNeeded: 1, vehicle: "Reunião de decisão com ata" },
+};
+
+const critC3: Criterion[] = [
+  { id: "cr4", stageId: "e2", name: "Impacto no NPS", weight: 60, scaleMax: 10 },
+  { id: "cr5", stageId: "e2", name: "Esforço de implantação", weight: 40, scaleMax: 5 },
+];
+
+const cfgC3: Record<string, StageConfig> = {
+  e1: { consolidation: "media", evaluatorsNeeded: 1, vehicle: "Triagem por e-mail" },
+  e2: { consolidation: "individual", evaluatorsNeeded: 2, vehicle: "Formulário online" },
+  e3: { consolidation: "media", evaluatorsNeeded: 1, vehicle: "Reunião de decisão com ata" },
+};
+
+const emptyEval = {
+  criteria: [] as Criterion[],
+  stageConfigs: {} as Record<string, StageConfig>,
+  evaluatorPoolIds: [] as string[],
+  committeeIds: [] as string[],
+};
 
 export const seedChallenges: Challenge[] = [
   {
@@ -102,6 +248,10 @@ export const seedChallenges: Challenge[] = [
     ownerId: "u2",
     status: "aberto",
     createdAt: "2026-01-15T13:00:00.000Z",
+    criteria: critC1,
+    stageConfigs: cfgC1,
+    evaluatorPoolIds: ["u5", "u7", "u6", "u2"],
+    committeeIds: ["u1", "u6"],
   },
   {
     id: "c2",
@@ -114,6 +264,9 @@ export const seedChallenges: Challenge[] = [
     ownerId: "u2",
     status: "pausado",
     createdAt: "2026-01-22T13:00:00.000Z",
+    ...emptyEval,
+    evaluatorPoolIds: ["u5", "u7"],
+    committeeIds: ["u1"],
   },
   {
     id: "c3",
@@ -130,6 +283,10 @@ export const seedChallenges: Challenge[] = [
     ownerId: "u6",
     status: "aberto",
     createdAt: "2026-02-05T13:00:00.000Z",
+    criteria: critC3,
+    stageConfigs: cfgC3,
+    evaluatorPoolIds: ["u5", "u4", "u7"],
+    committeeIds: ["u1", "u6"],
   },
   {
     id: "c4",
@@ -142,6 +299,7 @@ export const seedChallenges: Challenge[] = [
     ownerId: "u6",
     status: "rascunho",
     createdAt: "2026-02-18T13:00:00.000Z",
+    ...emptyEval,
   },
   {
     id: "c5",
@@ -155,6 +313,8 @@ export const seedChallenges: Challenge[] = [
     ownerId: "u1",
     status: "encerrado",
     createdAt: "2026-02-21T13:00:00.000Z",
+    ...emptyEval,
+    committeeIds: ["u1", "u6"],
   },
 ];
 
@@ -175,7 +335,27 @@ export const seedIdeas: Idea[] = [
     formSnapshot: seedChallenges[0]!.formFields,
     authorId: "u4",
     createdAt: "2026-02-10T13:00:00.000Z",
-  },
+    currentStageId: "s2",
+    stageHistory: [
+      { stageId: "s1", enteredAt: "2026-02-10T13:00:00.000Z", exitedAt: "2026-02-12T14:00:00.000Z", movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: "2026-02-12T14:00:00.000Z" },
+    ],
+    assignments: { s2: ["u5", "u7", "u6"] },
+    evaluations: [
+      {
+        id: "ev1",
+        stageId: "s2",
+        evaluatorId: "u7",
+        scores: { cr1: 8, cr2: 7, cr3: 6 },
+        comment: "Boa relação entre esforço e ganho. Precisa detalhar a origem dos dados do histórico.",
+        createdAt: "2026-02-15T18:00:00.000Z",
+        edited: false,
+        locked: false,
+      },
+    ],
+    classifications: [],
+    stageHistoryPlaceholder: undefined,
+  } as unknown as Idea,
   {
     id: "i2",
     challengeId: "c1",
@@ -187,6 +367,11 @@ export const seedIdeas: Idea[] = [
     formSnapshot: seedChallenges[0]!.formFields,
     authorId: "u3",
     createdAt: "2026-02-14T13:00:00.000Z",
+    currentStageId: "s1",
+    stageHistory: [{ stageId: "s1", enteredAt: "2026-02-14T13:00:00.000Z" }],
+    assignments: {},
+    evaluations: [],
+    classifications: [],
   },
   {
     id: "i3",
@@ -199,6 +384,26 @@ export const seedIdeas: Idea[] = [
     formSnapshot: seedChallenges[2]!.formFields,
     authorId: "u7",
     createdAt: "2026-03-02T13:00:00.000Z",
+    currentStageId: "e2",
+    stageHistory: [
+      { stageId: "e1", enteredAt: "2026-03-02T13:00:00.000Z", exitedAt: "2026-03-03T13:00:00.000Z", movedBy: "Diego Ferraz" },
+      { stageId: "e2", enteredAt: "2026-03-03T13:00:00.000Z" },
+    ],
+    assignments: { e2: ["u5", "u4"] },
+    evaluations: [
+      {
+        id: "ev2",
+        stageId: "e2",
+        evaluatorId: "u4",
+        scores: { cr4: 9, cr5: 3 },
+        comment: "Impacto alto no NPS, mas depende de integração com o legado.",
+        createdAt: "2026-03-04T12:00:00.000Z",
+        updatedAt: "2026-03-05T09:00:00.000Z",
+        edited: true,
+        locked: false,
+      },
+    ],
+    classifications: [],
   },
 ];
 
