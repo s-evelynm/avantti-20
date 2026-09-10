@@ -92,11 +92,23 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
                         <p className="mt-1 text-xs text-muted-foreground">
                           {users.find((u) => u.id === idea.authorId)?.name ?? "Anônimo"}
                         </p>
-                        {ready && (
-                          <span className="mt-2 inline-block rounded-full bg-success-bg px-2 py-1 text-xs text-success">
-                            Pronto para avançar
-                          </span>
-                        )}
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {ready && (
+                            <span className="rounded-full bg-success-bg px-2 py-1 text-xs text-success">
+                              Pronto para avançar
+                            </span>
+                          )}
+                          {triage && (
+                            <span className="rounded-full bg-muted px-2 py-1 text-xs">
+                              {triage.okCount} de {triage.total} ok
+                            </span>
+                          )}
+                          {dup && (
+                            <span className="rounded-full bg-warning-bg px-2 py-1 text-xs text-warning">
+                              possível duplicata
+                            </span>
+                          )}
+                        </div>
                       </button>
                     </li>
                   );
