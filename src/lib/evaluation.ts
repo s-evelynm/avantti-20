@@ -85,7 +85,7 @@ export function consolidate(
 export function isReady(challenge: Challenge, stage: FunnelStage, idea: Idea): boolean {
   const cfg = stageConfigOf(challenge, stage.id);
   if (stage.mechanism === "nota") {
-    const done = idea.evaluations.filter((e) => e.stageId === stage.id).length;
+    const done = idea.evaluations.filter((e) => e.stageId === stage.id && !e.draft).length;
     return done >= cfg.evaluatorsNeeded;
   }
   if (stage.mechanism === "classificacao")
