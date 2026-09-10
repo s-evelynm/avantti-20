@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, type LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 
 interface NavItem {
-  to: string;
+  to: LinkProps["to"];
   label: string;
   exact?: boolean;
 }
@@ -71,9 +71,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <p className="label-caps px-2 text-muted-foreground">{s.title}</p>
               <ul className="mt-2 space-y-1">
                 {s.items.map((n) => {
-                  const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
+                  const path = String(n.to);
+                  const active = n.exact ? pathname === path : pathname.startsWith(path);
                   return (
-                    <li key={n.to}>
+                    <li key={path}>
                       <Link
                         to={n.to}
                         aria-current={active ? "page" : undefined}
