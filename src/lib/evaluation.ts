@@ -114,6 +114,14 @@ export function nextStages(funnel: Funnel, idea: Idea): { stage: FunnelStage; co
     });
 }
 
+/** dias restantes do prazo da etapa atual (entrada na etapa + prazo padrão) */
+export function daysLeftInStage(idea: Idea, stage: FunnelStage): number | null {
+  const visit = [...idea.stageHistory].reverse().find((v) => v.stageId === stage.id && !v.exitedAt);
+  if (!visit) return null;
+  const due = new Date(visit.enteredAt).getTime() + stage.defaultDays * 24 * 60 * 60 * 1000;
+  return Math.ceil((due - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
 export function formatScore(v: number | null) {
   return v === null ? "—" : v.toFixed(1).replace(".", ",");
 }
