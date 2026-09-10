@@ -109,6 +109,7 @@ function DesafiosPage() {
                   <Link
                     to="/desafios/$challengeId"
                     params={{ challengeId: c.id }}
+                    search={{ aba: "visao" as const }}
                     className="font-medium text-primary underline-offset-2 hover:underline"
                   >
                     {c.title}

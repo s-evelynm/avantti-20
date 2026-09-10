@@ -76,7 +76,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   return (
                     <li key={path}>
                       <Link
-                        to={n.to}
+                        to={path}
                         aria-current={active ? "page" : undefined}
                         className={cn(
                           "block rounded-md px-2 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
