@@ -122,6 +122,7 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
 function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
   const {
     challenges,
+    ideas: allIdeas,
     users,
     currentUser,
     funnelOfChallenge,
