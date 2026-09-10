@@ -70,7 +70,7 @@ function AvaliacoesPage() {
           const assigned = (idea.assignments[stage.id] ?? []).includes(currentUser.id);
           if (!assigned) return null;
           const minha = idea.evaluations.find(
-            (e) => e.stageId === stage.id && e.evaluatorId === currentUser.id,
+            (e) => e.stageId === stage.id && e.evaluatorId === currentUser.id && !e.draft,
           );
           return { idea, challenge, stage, minha };
         })
