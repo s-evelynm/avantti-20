@@ -85,7 +85,7 @@ export function consolidate(
 export function isReady(challenge: Challenge, stage: FunnelStage, idea: Idea): boolean {
   const cfg = stageConfigOf(challenge, stage.id);
   if (stage.mechanism === "nota") {
-    const done = idea.evaluations.filter((e) => e.stageId === stage.id).length;
+    const done = idea.evaluations.filter((e) => e.stageId === stage.id && !e.draft).length;
     return done >= cfg.evaluatorsNeeded;
   }
   if (stage.mechanism === "classificacao")
@@ -112,6 +112,14 @@ export function nextStages(funnel: Funnel, idea: Idea): { stage: FunnelStage; co
       if (!match) return true;
       return classification === match[1];
     });
+}
+
+/** dias restantes do prazo da etapa atual (entrada na etapa + prazo padrão) */
+export function daysLeftInStage(idea: Idea, stage: FunnelStage): number | null {
+  const visit = [...idea.stageHistory].reverse().find((v) => v.stageId === stage.id && !v.exitedAt);
+  if (!visit) return null;
+  const due = new Date(visit.enteredAt).getTime() + stage.defaultDays * 24 * 60 * 60 * 1000;
+  return Math.ceil((due - Date.now()) / (24 * 60 * 60 * 1000));
 }
 
 export function formatScore(v: number | null) {

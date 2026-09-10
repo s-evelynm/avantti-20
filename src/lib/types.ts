@@ -126,6 +126,8 @@ export interface Evaluation {
   updatedAt?: string | undefined;
   edited: boolean;
   locked: boolean;
+  /** rascunho salvo pelo avaliador, ainda não enviado */
+  draft?: boolean | undefined;
 }
 
 export interface ClassificationResult {

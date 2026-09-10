@@ -318,7 +318,15 @@ export const seedChallenges: Challenge[] = [
   },
 ];
 
+const DAY = 24 * 60 * 60 * 1000;
+const daysAgo = (n: number, hour = 12) => {
+  const d = new Date(Date.now() - n * DAY);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+};
+
 export const seedIdeas: Idea[] = [
+
   {
     id: "i1",
     challengeId: "c1",
@@ -337,10 +345,10 @@ export const seedIdeas: Idea[] = [
     createdAt: "2026-02-10T13:00:00.000Z",
     currentStageId: "s2",
     stageHistory: [
-      { stageId: "s1", enteredAt: "2026-02-10T13:00:00.000Z", exitedAt: "2026-02-12T14:00:00.000Z", movedBy: "Rafael Andrade" },
-      { stageId: "s2", enteredAt: "2026-02-12T14:00:00.000Z" },
+      { stageId: "s1", enteredAt: daysAgo(6), exitedAt: daysAgo(3), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(3) },
     ],
-    assignments: { s2: ["u5", "u7", "u6"] },
+    assignments: { s2: ["u5", "u7", "u6", "u1"] },
     evaluations: [
       {
         id: "ev1",
@@ -385,10 +393,10 @@ export const seedIdeas: Idea[] = [
     createdAt: "2026-03-02T13:00:00.000Z",
     currentStageId: "e2",
     stageHistory: [
-      { stageId: "e1", enteredAt: "2026-03-02T13:00:00.000Z", exitedAt: "2026-03-03T13:00:00.000Z", movedBy: "Diego Ferraz" },
-      { stageId: "e2", enteredAt: "2026-03-03T13:00:00.000Z" },
+      { stageId: "e1", enteredAt: daysAgo(6), exitedAt: daysAgo(4), movedBy: "Diego Ferraz" },
+      { stageId: "e2", enteredAt: daysAgo(4) },
     ],
-    assignments: { e2: ["u5", "u4"] },
+    assignments: { e2: ["u5", "u4", "u1"] },
     evaluations: [
       {
         id: "ev2",
@@ -400,6 +408,189 @@ export const seedIdeas: Idea[] = [
         updatedAt: "2026-03-05T09:00:00.000Z",
         edited: true,
         locked: false,
+      },
+    ],
+    classifications: [],
+  },
+  {
+    id: "i4",
+    challengeId: "c1",
+    title: "Automação de checagem de estoque",
+    description:
+      "Sensores de RFID nas prateleiras enviando alerta automático quando o estoque de um item cai abaixo do mínimo, eliminando a contagem manual semanal.",
+    link: "",
+    attachments: [],
+    answers: {
+      ff1: "Contagem manual semanal atrasa o abastecimento das equipes de campo.",
+      ff2: "Piloto rodando",
+      ff3: ["Operações", "Suprimentos"],
+    },
+    formSnapshot: seedChallenges[0]!.formFields,
+    authorId: "u3",
+    createdAt: daysAgo(9),
+    currentStageId: "s2",
+    stageHistory: [
+      { stageId: "s1", enteredAt: daysAgo(9), exitedAt: daysAgo(3), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(3) },
+    ],
+    assignments: { s2: ["u1", "u5", "u7"] },
+    evaluations: [],
+    classifications: [],
+  },
+  {
+    id: "i5",
+    challengeId: "c3",
+    title: "App de retorno de embalagens",
+    description:
+      "Aplicativo que agenda a coleta de embalagens retornáveis direto com o cliente, reduzindo viagens extras da frota.",
+    link: "https://intranet.exemplo.com/ideias/retorno",
+    attachments: ["estudo-retorno.pdf"],
+    answers: {
+      ff5: "Diminui o atrito no pós-venda e aumenta a percepção de sustentabilidade.",
+      ff6: "Não",
+    },
+    formSnapshot: seedChallenges[2]!.formFields,
+    authorId: "u4",
+    createdAt: daysAgo(8),
+    currentStageId: "e2",
+    stageHistory: [
+      { stageId: "e1", enteredAt: daysAgo(8), exitedAt: daysAgo(4), movedBy: "Diego Ferraz" },
+      { stageId: "e2", enteredAt: daysAgo(4) },
+    ],
+    assignments: { e2: ["u1", "u5"] },
+    evaluations: [],
+    classifications: [],
+  },
+  {
+    id: "i6",
+    challengeId: "c1",
+    title: "Rota otimizada de entregas",
+    description:
+      "Roteirizador que recalcula a sequência de visitas a cada hora considerando trânsito e prioridade do chamado.",
+    link: "",
+    attachments: [],
+    answers: {
+      ff1: "Deslocamentos longos entre chamados na mesma região.",
+      ff2: "Protótipo",
+      ff3: ["Operações", "Tecnologia"],
+    },
+    formSnapshot: seedChallenges[0]!.formFields,
+    authorId: "u4",
+    createdAt: daysAgo(12),
+    currentStageId: "s2",
+    stageHistory: [
+      { stageId: "s1", enteredAt: daysAgo(12), exitedAt: daysAgo(5), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(5) },
+    ],
+    assignments: { s2: ["u1", "u5", "u7"] },
+    evaluations: [
+      {
+        id: "ev3",
+        stageId: "s2",
+        evaluatorId: "u1",
+        scores: { cr1: 9, cr2: 8, cr3: 7 },
+        comment: "Ganho claro de produtividade e implantação simples com a telemetria atual.",
+        createdAt: daysAgo(0, 9),
+        edited: false,
+        locked: false,
+      },
+      {
+        id: "ev4",
+        stageId: "s2",
+        evaluatorId: "u5",
+        scores: { cr1: 9, cr2: 8, cr3: 7 },
+        comment: "Alto impacto no custo por ordem de serviço.",
+        createdAt: daysAgo(0, 10),
+        edited: false,
+        locked: false,
+      },
+    ],
+    classifications: [],
+  },
+  {
+    id: "i7",
+    challengeId: "c1",
+    title: "Padronização de embalagens de peças",
+    description:
+      "Kit único de embalagem para peças de alto giro, reduzindo perdas no transporte e tempo de separação.",
+    link: "",
+    attachments: [],
+    answers: {
+      ff1: "Perdas e retrabalho na separação de peças.",
+      ff2: "Conceito",
+      ff3: ["Suprimentos"],
+    },
+    formSnapshot: seedChallenges[0]!.formFields,
+    authorId: "u3",
+    createdAt: daysAgo(14),
+    currentStageId: "s2",
+    stageHistory: [
+      { stageId: "s1", enteredAt: daysAgo(14), exitedAt: daysAgo(6), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(6) },
+    ],
+    assignments: { s2: ["u1", "u5"] },
+    evaluations: [
+      {
+        id: "ev5",
+        stageId: "s2",
+        evaluatorId: "u1",
+        scores: { cr1: 7, cr2: 7, cr3: 5 },
+        comment: "Ganho moderado; vale testar em uma regional antes de escalar.",
+        createdAt: daysAgo(3, 15),
+        edited: false,
+        locked: false,
+      },
+      {
+        id: "ev6",
+        stageId: "s2",
+        evaluatorId: "u5",
+        scores: { cr1: 7, cr2: 6, cr3: 5 },
+        comment: "Solução conhecida, mas resolve uma dor real de separação.",
+        createdAt: daysAgo(3, 16),
+        edited: false,
+        locked: false,
+      },
+    ],
+    classifications: [],
+  },
+  {
+    id: "i8",
+    challengeId: "c3",
+    title: "Portal único do fornecedor",
+    description:
+      "Centraliza notas, agendamentos e status de pagamento em um só lugar, eliminando trocas de e-mail.",
+    link: "",
+    attachments: [],
+    answers: { ff5: "Reduz chamados repetidos de fornecedores nos canais digitais.", ff6: "Sim" },
+    formSnapshot: seedChallenges[2]!.formFields,
+    authorId: "u3",
+    createdAt: daysAgo(30),
+    currentStageId: "e2",
+    stageHistory: [
+      { stageId: "e1", enteredAt: daysAgo(30), exitedAt: daysAgo(24), movedBy: "Diego Ferraz" },
+      { stageId: "e2", enteredAt: daysAgo(24) },
+    ],
+    assignments: { e2: ["u1", "u5"] },
+    evaluations: [
+      {
+        id: "ev7",
+        stageId: "e2",
+        evaluatorId: "u1",
+        scores: { cr4: 8, cr5: 4 },
+        comment: "Boa redução de esforço do time de atendimento.",
+        createdAt: daysAgo(22, 11),
+        edited: false,
+        locked: true,
+      },
+      {
+        id: "ev8",
+        stageId: "e2",
+        evaluatorId: "u5",
+        scores: { cr4: 8, cr5: 3 },
+        comment: "Depende de integração, mas o ganho é consistente.",
+        createdAt: daysAgo(22, 14),
+        edited: false,
+        locked: true,
       },
     ],
     classifications: [],
