@@ -18,6 +18,7 @@ import {
 import type {
   Challenge,
   ChallengeStatus,
+  Funnel,
   Idea,
   LogEntry,
   Objective,
@@ -72,6 +73,21 @@ interface Ctx {
   ) => void;
   logsFor: (entityId: string) => LogEntry[];
   visiblePrograms: (userId: string) => Program[];
+  /* ---------- Épico 2 ---------- */
+  funnelOfChallenge: (challengeId: string) => Funnel;
+  updateFunnel: (programId: string, funnel: Funnel, what: string) => void;
+  assignEvaluators: (ideaId: string, stageId: string, evaluatorIds: string[]) => void;
+  saveEvaluation: (
+    ideaId: string,
+    stageId: string,
+    scores: Record<string, number>,
+    comment: string,
+  ) => void;
+  classifyIdea: (ideaId: string, stageId: string, option: string) => void;
+  advanceIdea: (ideaId: string, toStageId: string) => void;
+  decideIdea: (ideaId: string, result: "aprovada" | "reprovada", justification: string) => void;
+  setIdeaFeedback: (ideaId: string, message: string, origin: "manual" | "ia") => void;
+  approveFeedback: (ideaId: string) => void;
 }
 
 const AppContext = createContext<Ctx | null>(null);
