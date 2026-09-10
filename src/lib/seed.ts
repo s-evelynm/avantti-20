@@ -603,6 +603,132 @@ export const seedIdeas: Idea[] = [
     ],
     classifications: [],
   },
+  {
+    id: "i9",
+    challengeId: "c1",
+    title: "Checklist digital de qualidade",
+    description:
+      "Formulário digital preenchido pelo técnico ao encerrar a visita, com foto obrigatória e validação automática dos itens críticos.",
+    link: "https://intranet.exemplo.com/ideias/checklist-digital",
+    attachments: ["checklist-digital.pdf"],
+    answers: {
+      ff1: "Falhas de qualidade só aparecem semanas depois, no retrabalho.",
+      ff2: "Piloto rodando",
+      ff3: ["Operações", "Tecnologia"],
+    },
+    formSnapshot: seedChallenges[0]!.formFields,
+    authorId: "u1",
+    createdAt: daysAgo(45),
+    currentStageId: "s5",
+    stageHistory: [
+      { stageId: "s1", enteredAt: daysAgo(45), exitedAt: daysAgo(40), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(40), exitedAt: daysAgo(30), movedBy: "Rafael Andrade" },
+      { stageId: "s3", enteredAt: daysAgo(30), exitedAt: daysAgo(22), movedBy: "Diego Ferraz" },
+      { stageId: "s4", enteredAt: daysAgo(22), exitedAt: daysAgo(12), movedBy: "Diego Ferraz" },
+      { stageId: "s5", enteredAt: daysAgo(12) },
+    ],
+    assignments: {},
+    evaluations: [],
+    classifications: [{ stageId: "s3", option: "Quick win", byId: "u6", at: daysAgo(23) }],
+    decision: {
+      result: "aprovada",
+      justification: "Ganho rápido, baixo custo de implantação e piloto já validado em duas regionais.",
+      byId: "u6",
+      at: daysAgo(10),
+      minutes:
+        "Ata da reunião do comitê decisor: presentes Evelyn Monteiro e Diego Ferraz. Aprovada a implantação do checklist digital em todas as regionais no próximo trimestre.",
+    },
+    feedback: {
+      message:
+        "Sua ideia foi aprovada pelo comitê. A implantação começa pelas regionais Sul e Sudeste e você será convidada a acompanhar o piloto.",
+      origin: "manual",
+      approved: true,
+      approvedBy: "Diego Ferraz",
+      approvedAt: daysAgo(10),
+    },
+  },
+  {
+    id: "i10",
+    challengeId: "c1",
+    title: "Etiquetas inteligentes no almoxarifado",
+    description:
+      "Etiquetas com QR code que registram a retirada da peça pelo celular, mantendo o saldo do almoxarifado sempre atualizado.",
+    link: "",
+    attachments: [],
+    answers: {
+      ff1: "Saldo do almoxarifado desatualizado gera visita sem peça.",
+      ff2: "Protótipo",
+      ff3: ["Operações", "Suprimentos"],
+    },
+    formSnapshot: seedChallenges[0]!.formFields,
+    authorId: "u1",
+    createdAt: daysAgo(11),
+    currentStageId: "s2",
+    stageHistory: [
+      { stageId: "s1", enteredAt: daysAgo(11), exitedAt: daysAgo(5), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(5) },
+    ],
+    assignments: { s2: ["u5", "u7"] },
+    evaluations: [],
+    classifications: [],
+  },
+  {
+    id: "i11",
+    challengeId: "c3",
+    title: "Assistente de dúvidas no portal do cliente",
+    description:
+      "Busca guiada que resolve as dez dúvidas mais frequentes antes de abrir um atendimento humano.",
+    link: "",
+    attachments: [],
+    answers: { ff5: "Reduz o volume de chamados simples e o tempo de espera.", ff6: "Não" },
+    formSnapshot: seedChallenges[2]!.formFields,
+    authorId: "u1",
+    createdAt: daysAgo(4),
+    currentStageId: "e1",
+    stageHistory: [{ stageId: "e1", enteredAt: daysAgo(4) }],
+    assignments: {},
+    evaluations: [],
+    classifications: [],
+  },
+  {
+    id: "i12",
+    challengeId: "c3",
+    title: "Central de agendamento pelo cliente",
+    description:
+      "O próprio cliente escolhe a janela de atendimento pelo aplicativo, com confirmação automática da equipe.",
+    link: "",
+    attachments: [],
+    answers: { ff5: "Menos remarcações e menos contatos repetidos.", ff6: "Sim" },
+    formSnapshot: seedChallenges[2]!.formFields,
+    authorId: "u1",
+    createdAt: daysAgo(60),
+    currentStageId: "e3",
+    stageHistory: [
+      { stageId: "e1", enteredAt: daysAgo(60), exitedAt: daysAgo(52), movedBy: "Diego Ferraz" },
+      { stageId: "e2", enteredAt: daysAgo(52), exitedAt: daysAgo(38), movedBy: "Diego Ferraz" },
+      { stageId: "e3", enteredAt: daysAgo(38) },
+    ],
+    assignments: {},
+    evaluations: [],
+    classifications: [],
+    decision: {
+      result: "reprovada",
+      justification:
+        "A integração com o sistema legado de roteirização inviabiliza o prazo do programa neste ciclo.",
+      byId: "u6",
+      at: daysAgo(35),
+      minutes:
+        "Ata da reunião de decisão: presentes Evelyn Monteiro e Diego Ferraz. Ideia não aprovada neste ciclo por dependência crítica do legado de roteirização.",
+    },
+    feedback: {
+      message:
+        "A ideia não avançou neste ciclo por depender do sistema legado de roteirização. Vale reapresentá-la após a migração prevista para o próximo semestre.",
+      origin: "manual",
+      approved: true,
+      approvedBy: "Diego Ferraz",
+      approvedAt: daysAgo(34),
+    },
+  },
 ];
 
 export const seedLogs: LogEntry[] = [
