@@ -96,6 +96,8 @@ export interface Challenge {
   title: string;
   context: string;
   objectiveIds: string[];
+  /** imagem de capa exibida na listagem e na página pública */
+  coverUrl?: string | undefined;
   formFields: FormField[];
   kind: "pontual" | "continuo";
   deadline?: string | undefined;
