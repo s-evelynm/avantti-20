@@ -248,7 +248,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addIdea: Ctx["addIdea"] = (i) => {
-    const idea: Idea = { ...i, id: uid(), createdAt: new Date().toISOString() };
+    const program = programs.find((p) => p.id === challenges.find((c) => c.id === i.challengeId)?.programId);
+    const firstStage = program?.funnel.stages[0];
+    const idea: Idea = {
+      ...i,
+      id: uid(),
+      createdAt: new Date().toISOString(),
+      currentStageId: firstStage?.id,
+      stageHistory: firstStage ? [{ stageId: firstStage.id, enteredAt: new Date().toISOString() }] : [],
+      assignments: {},
+      evaluations: [],
+      classifications: [],
+    };
     setIdeas((prev) => [idea, ...prev]);
     log(
       { entityType: "ideia", entityId: idea.challengeId, entityLabel: idea.title, action: "Ideia submetida", detail: "Submissão registrada com a estrutura atual do formulário." },
@@ -266,10 +277,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return p.audience.userIds.includes(userId);
     });
 
+  const caps: Capabilities = {
+    participar: visiblePrograms(viewer.id).length > 0,
+    avaliar: challenges.some(
+      (c) => c.evaluatorPoolIds.includes(viewer.id) || c.committeeIds.includes(viewer.id),
+    ),
+    gerenciar: role === "admin" || role === "gestor" || challenges.some((c) => c.ownerId === viewer.id),
+    configurar: role === "admin",
+  };
+
   const value: Ctx = {
     role,
-    setRole,
+    viewAsId,
+    setViewAs,
+    caps,
     currentUser,
+
     areas: AREAS,
     users: USERS,
     programs,
