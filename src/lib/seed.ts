@@ -354,8 +354,7 @@ export const seedIdeas: Idea[] = [
       },
     ],
     classifications: [],
-    stageHistoryPlaceholder: undefined,
-  } as unknown as Idea,
+  },
   {
     id: "i2",
     challengeId: "c1",
