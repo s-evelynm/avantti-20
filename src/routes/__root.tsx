@@ -133,12 +133,29 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <AppLayout>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </AppLayout>
+        <Shell />
         <Toaster />
       </AppProvider>
     </QueryClientProvider>
+  );
+}
+
+function Shell() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // A página pública do desafio é uma tela separada, sem o menu lateral do sistema.
+  const publicPage = /^\/explorar\/[^/]+/.test(pathname);
+
+  if (publicPage)
+    return (
+      <div className="min-h-screen bg-background">
+        <Outlet />
+      </div>
+    );
+
+  return (
+    <AppLayout>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
+    </AppLayout>
   );
 }
