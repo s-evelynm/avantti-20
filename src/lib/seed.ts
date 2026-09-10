@@ -318,7 +318,15 @@ export const seedChallenges: Challenge[] = [
   },
 ];
 
+const DAY = 24 * 60 * 60 * 1000;
+const daysAgo = (n: number, hour = 12) => {
+  const d = new Date(Date.now() - n * DAY);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+};
+
 export const seedIdeas: Idea[] = [
+
   {
     id: "i1",
     challengeId: "c1",
