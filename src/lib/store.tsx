@@ -186,6 +186,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...c,
       id: uid(),
       status: "rascunho",
+      criteria: [],
+      stageConfigs: {},
+      evaluatorPoolIds: [],
+      committeeIds: [],
       createdAt: new Date().toISOString(),
     };
     setChallenges((prev) => [challenge, ...prev]);
