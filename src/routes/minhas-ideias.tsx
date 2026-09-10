@@ -92,7 +92,7 @@ function MinhasIdeias() {
                   {decidida ? (
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        aprovada ? "bg-success-soft text-success" : "bg-muted text-muted-foreground"
+                        aprovada ? "bg-success-bg text-success" : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {aprovada ? "Aprovada" : "Não aprovada"}
