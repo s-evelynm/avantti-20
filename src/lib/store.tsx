@@ -27,9 +27,18 @@ import type {
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
+export interface Capabilities {
+  participar: boolean;
+  avaliar: boolean;
+  gerenciar: boolean;
+  configurar: boolean;
+}
+
 interface Ctx {
   role: Role;
-  setRole: (r: Role) => void;
+  viewAsId: string;
+  setViewAs: (id: string) => void;
+  caps: Capabilities;
   currentUser: { id: string; name: string };
   areas: string[];
   users: typeof USERS;
@@ -38,18 +47,29 @@ interface Ctx {
   challenges: Challenge[];
   ideas: Idea[];
   logs: LogEntry[];
-  addProgram: (p: Omit<Program, "id" | "createdAt">, origin?: string) => Program;
+  addProgram: (p: Omit<Program, "id" | "createdAt" | "funnel">, origin?: string) => Program;
   updateProgram: (id: string, patch: Partial<Program>, what: string) => void;
   deleteProgram: (id: string) => void;
   addObjective: (o: Omit<Objective, "id">) => void;
   updateObjective: (id: string, patch: Partial<Objective>) => void;
   deleteObjective: (id: string) => void;
   objectiveInUse: (id: string) => boolean;
-  addChallenge: (c: Omit<Challenge, "id" | "createdAt" | "status">, origin?: string) => Challenge;
+  addChallenge: (
+    c: Omit<
+      Challenge,
+      "id" | "createdAt" | "status" | "criteria" | "stageConfigs" | "evaluatorPoolIds" | "committeeIds"
+    >,
+    origin?: string,
+  ) => Challenge;
   updateChallenge: (id: string, patch: Partial<Challenge>, what: string) => void;
   setChallengeStatus: (id: string, status: ChallengeStatus) => void;
   deleteChallenge: (id: string) => void;
-  addIdea: (i: Omit<Idea, "id" | "createdAt">) => void;
+  addIdea: (
+    i: Omit<
+      Idea,
+      "id" | "createdAt" | "stageHistory" | "assignments" | "evaluations" | "classifications"
+    >,
+  ) => void;
   logsFor: (entityId: string) => LogEntry[];
   visiblePrograms: (userId: string) => Program[];
 }
@@ -57,18 +77,17 @@ interface Ctx {
 const AppContext = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role>("admin");
+  const [viewAsId, setViewAs] = useState("u1");
   const [programs, setPrograms] = useState<Program[]>(seedPrograms);
   const [objectives, setObjectives] = useState<Objective[]>(seedObjectives);
   const [challenges, setChallenges] = useState<Challenge[]>(seedChallenges);
   const [ideas, setIdeas] = useState<Idea[]>(seedIdeas);
   const [logs, setLogs] = useState<LogEntry[]>(seedLogs);
 
-  const currentUser = useMemo(() => {
-    if (role === "admin") return { id: "u1", name: "Evelyn Monteiro" };
-    if (role === "gestor") return { id: "u2", name: "Rafael Andrade" };
-    return { id: "u3", name: "Camila Torres" };
-  }, [role]);
+  const viewer = USERS.find((u) => u.id === viewAsId) ?? USERS[0]!;
+  const role: Role = viewer.role;
+  const currentUser = useMemo(() => ({ id: viewer.id, name: viewer.name }), [viewer.id, viewer.name]);
+
 
   const log = useCallback(
     (entry: Omit<LogEntry, "id" | "at" | "actor">, actor: string) => {
