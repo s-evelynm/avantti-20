@@ -345,10 +345,10 @@ export const seedIdeas: Idea[] = [
     createdAt: "2026-02-10T13:00:00.000Z",
     currentStageId: "s2",
     stageHistory: [
-      { stageId: "s1", enteredAt: "2026-02-10T13:00:00.000Z", exitedAt: "2026-02-12T14:00:00.000Z", movedBy: "Rafael Andrade" },
-      { stageId: "s2", enteredAt: "2026-02-12T14:00:00.000Z" },
+      { stageId: "s1", enteredAt: daysAgo(6), exitedAt: daysAgo(3), movedBy: "Rafael Andrade" },
+      { stageId: "s2", enteredAt: daysAgo(3) },
     ],
-    assignments: { s2: ["u5", "u7", "u6"] },
+    assignments: { s2: ["u5", "u7", "u6", "u1"] },
     evaluations: [
       {
         id: "ev1",
