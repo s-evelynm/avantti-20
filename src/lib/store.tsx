@@ -537,6 +537,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addIdea,
     logsFor,
     visiblePrograms,
+    funnelOfChallenge,
+    updateFunnel,
+    assignEvaluators,
+    saveEvaluation,
+    classifyIdea,
+    advanceIdea,
+    decideIdea,
+    setIdeaFeedback,
+    approveFeedback,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
