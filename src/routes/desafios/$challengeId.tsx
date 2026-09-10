@@ -9,6 +9,8 @@ import {
   crumbLinkClass,
 } from "@/components/AppLayout";
 import { FormBuilder } from "@/components/FormBuilder";
+import { FunnelBoard } from "@/components/FunnelBoard";
+import { EvaluationSetup } from "@/components/EvaluationSetup";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -282,6 +284,13 @@ function DesafioDetalhe() {
             )}
           </section>
 
+          {isAdmin && (
+            <section className="space-y-4">
+              <h2>Configuração de avaliação</h2>
+              <EvaluationSetup challengeId={challenge.id} />
+            </section>
+          )}
+
           <section>
             <h2 className="mb-4">Histórico de alterações</h2>
             <HistoryList entries={logsFor(challenge.id)} />
@@ -349,13 +358,7 @@ function DesafioDetalhe() {
 
         {showAcompanhamento && (
           <TabsContent value="acompanhamento" className="mt-6">
-            <div className="rounded-xl border border-dashed bg-card p-6 text-center">
-              <p className="label-caps">Reservado</p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                O acompanhamento das ideias pelo funil de avaliação entra no próximo passo do protótipo.
-                A aba só existe a partir do momento em que o desafio é aberto.
-              </p>
-            </div>
+            <FunnelBoard challengeId={challenge.id} />
           </TabsContent>
         )}
       </Tabs>

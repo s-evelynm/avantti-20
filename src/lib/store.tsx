@@ -18,6 +18,7 @@ import {
 import type {
   Challenge,
   ChallengeStatus,
+  Funnel,
   Idea,
   LogEntry,
   Objective,
@@ -72,6 +73,21 @@ interface Ctx {
   ) => void;
   logsFor: (entityId: string) => LogEntry[];
   visiblePrograms: (userId: string) => Program[];
+  /* ---------- Épico 2 ---------- */
+  funnelOfChallenge: (challengeId: string) => Funnel;
+  updateFunnel: (programId: string, funnel: Funnel, what: string) => void;
+  assignEvaluators: (ideaId: string, stageId: string, evaluatorIds: string[]) => void;
+  saveEvaluation: (
+    ideaId: string,
+    stageId: string,
+    scores: Record<string, number>,
+    comment: string,
+  ) => void;
+  classifyIdea: (ideaId: string, stageId: string, option: string) => void;
+  advanceIdea: (ideaId: string, toStageId: string) => void;
+  decideIdea: (ideaId: string, result: "aprovada" | "reprovada", justification: string) => void;
+  setIdeaFeedback: (ideaId: string, message: string, origin: "manual" | "ia") => void;
+  approveFeedback: (ideaId: string) => void;
 }
 
 const AppContext = createContext<Ctx | null>(null);
@@ -267,6 +283,213 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  /* ---------------- Épico 2: processo de avaliação ---------------- */
+
+  const emptyFunnel: Funnel = { stages: [], transitions: [] };
+
+  const funnelOfChallenge: Ctx["funnelOfChallenge"] = (challengeId) => {
+    const ch = challenges.find((c) => c.id === challengeId);
+    return programs.find((p) => p.id === ch?.programId)?.funnel ?? emptyFunnel;
+  };
+
+  const updateFunnel: Ctx["updateFunnel"] = (programId, funnel, what) => {
+    setPrograms((prev) => prev.map((p) => (p.id === programId ? { ...p, funnel } : p)));
+    log(
+      {
+        entityType: "programa",
+        entityId: programId,
+        entityLabel: programs.find((p) => p.id === programId)?.name ?? "",
+        action: "Funil de avaliação alterado",
+        detail: what,
+      },
+      currentUser.name,
+    );
+  };
+
+  const ideaLog = (idea: Idea, action: string, detail: string) =>
+    log(
+      { entityType: "ideia", entityId: idea.challengeId, entityLabel: idea.title, action, detail },
+      currentUser.name,
+    );
+
+  const assignEvaluators: Ctx["assignEvaluators"] = (ideaId, stageId, evaluatorIds) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    setIdeas((prev) =>
+      prev.map((i) =>
+        i.id === ideaId ? { ...i, assignments: { ...i.assignments, [stageId]: evaluatorIds } } : i,
+      ),
+    );
+    if (idea)
+      ideaLog(
+        idea,
+        "Distribuição atualizada",
+        `${evaluatorIds.length} avaliador(es) designado(s) para a etapa atual: ${evaluatorIds
+          .map((id) => USERS.find((u) => u.id === id)?.name ?? id)
+          .join(", ") || "nenhum"}.`,
+      );
+  };
+
+  const saveEvaluation: Ctx["saveEvaluation"] = (ideaId, stageId, scores, comment) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    const now = new Date().toISOString();
+    let wasEdit = false;
+    setIdeas((prev) =>
+      prev.map((i) => {
+        if (i.id !== ideaId) return i;
+        const existing = i.evaluations.find(
+          (e) => e.stageId === stageId && e.evaluatorId === viewer.id,
+        );
+        if (existing?.locked) return i;
+        wasEdit = !!existing;
+        const evaluations = existing
+          ? i.evaluations.map((e) =>
+              e.id === existing.id
+                ? { ...e, scores, comment, updatedAt: now, edited: true }
+                : e,
+            )
+          : [
+              ...i.evaluations,
+              {
+                id: uid(),
+                stageId,
+                evaluatorId: viewer.id,
+                scores,
+                comment,
+                createdAt: now,
+                edited: false,
+                locked: false,
+              },
+            ];
+        return { ...i, evaluations };
+      }),
+    );
+    if (idea)
+      ideaLog(
+        idea,
+        wasEdit ? "Avaliação editada" : "Avaliação registrada",
+        `${currentUser.name} ${wasEdit ? "alterou" : "registrou"} notas e comentário na etapa atual.`,
+      );
+  };
+
+  const classifyIdea: Ctx["classifyIdea"] = (ideaId, stageId, option) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    setIdeas((prev) =>
+      prev.map((i) =>
+        i.id === ideaId
+          ? {
+              ...i,
+              classifications: [
+                ...i.classifications.filter((c) => c.stageId !== stageId),
+                { stageId, option, byId: viewer.id, at: new Date().toISOString() },
+              ],
+            }
+          : i,
+      ),
+    );
+    if (idea) ideaLog(idea, "Classificação registrada", `Opção escolhida: ${option}.`);
+  };
+
+  const advanceIdea: Ctx["advanceIdea"] = (ideaId, toStageId) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    const now = new Date().toISOString();
+    setIdeas((prev) =>
+      prev.map((i) => {
+        if (i.id !== ideaId) return i;
+        return {
+          ...i,
+          evaluations: i.evaluations.map((e) =>
+            e.stageId === i.currentStageId ? { ...e, locked: true } : e,
+          ),
+          stageHistory: [
+            ...i.stageHistory.map((v) =>
+              v.stageId === i.currentStageId && !v.exitedAt
+                ? { ...v, exitedAt: now, movedBy: currentUser.name }
+                : v,
+            ),
+            { stageId: toStageId, enteredAt: now },
+          ],
+          currentStageId: toStageId,
+        };
+      }),
+    );
+    if (idea) {
+      const funnel = funnelOfChallenge(idea.challengeId);
+      const from = funnel.stages.find((s) => s.id === idea.currentStageId)?.name ?? "—";
+      const to = funnel.stages.find((s) => s.id === toStageId)?.name ?? "—";
+      ideaLog(
+        idea,
+        "Ideia avançou de etapa",
+        `De "${from}" para "${to}" — avanço manual de ${currentUser.name}. Avaliações da etapa anterior ficaram travadas.`,
+      );
+    }
+  };
+
+  const decideIdea: Ctx["decideIdea"] = (ideaId, result, justification) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    const at = new Date().toISOString();
+    const challenge = challenges.find((c) => c.id === idea?.challengeId);
+    const minutes = [
+      `ATA DE DECISÃO — ${formatDateTime(at)}`,
+      `Desafio: ${challenge?.title ?? "—"}`,
+      `Ideia: ${idea?.title ?? "—"}`,
+      `Comitê presente: ${(challenge?.committeeIds ?? [])
+        .map((id) => USERS.find((u) => u.id === id)?.name ?? id)
+        .join(", ") || "não informado"}`,
+      `Resultado: ${result === "aprovada" ? "Aprovada" : "Não aprovada"}`,
+      `Justificativa: ${justification}`,
+      `Registrado por: ${currentUser.name}`,
+    ].join("\n");
+    setIdeas((prev) =>
+      prev.map((i) =>
+        i.id === ideaId
+          ? { ...i, decision: { result, justification, byId: viewer.id, at, minutes } }
+          : i,
+      ),
+    );
+    if (idea)
+      ideaLog(
+        idea,
+        "Decisão final registrada",
+        `${result === "aprovada" ? "Aprovada" : "Não aprovada"}. Ata gerada automaticamente.`,
+      );
+  };
+
+  const setIdeaFeedback: Ctx["setIdeaFeedback"] = (ideaId, message, origin) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    setIdeas((prev) =>
+      prev.map((i) => (i.id === ideaId ? { ...i, feedback: { message, origin, approved: false } } : i)),
+    );
+    if (idea)
+      ideaLog(
+        idea,
+        "Feedback rascunhado",
+        origin === "ia"
+          ? "Rascunho gerado por IA simulada. Aguardando aprovação humana para envio."
+          : "Rascunho escrito manualmente. Aguardando aprovação para envio.",
+      );
+  };
+
+  const approveFeedback: Ctx["approveFeedback"] = (ideaId) => {
+    const idea = ideas.find((i) => i.id === ideaId);
+    setIdeas((prev) =>
+      prev.map((i) =>
+        i.id === ideaId && i.feedback
+          ? {
+              ...i,
+              feedback: {
+                ...i.feedback,
+                approved: true,
+                approvedBy: currentUser.name,
+                approvedAt: new Date().toISOString(),
+              },
+            }
+          : i,
+      ),
+    );
+    if (idea)
+      ideaLog(idea, "Feedback aprovado e enviado", `Aprovação manual de ${currentUser.name}.`);
+  };
+
   const logsFor = (entityId: string) => logs.filter((l) => l.entityId === entityId);
 
   const visiblePrograms = (userId: string) =>
@@ -314,6 +537,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addIdea,
     logsFor,
     visiblePrograms,
+    funnelOfChallenge,
+    updateFunnel,
+    assignEvaluators,
+    saveEvaluation,
+    classifyIdea,
+    advanceIdea,
+    decideIdea,
+    setIdeaFeedback,
+    approveFeedback,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

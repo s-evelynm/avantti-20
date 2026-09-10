@@ -85,3 +85,32 @@ export function aiReviewChallenge(c: {
   });
   return items;
 }
+
+/** Feedback ao autor gerado por IA simulada — SEMPRE exige aprovação humana antes do envio. */
+export function aiFeedbackFromEvaluations(input: {
+  ideaTitle: string;
+  authorName: string;
+  comments: string[];
+  approved?: boolean | undefined;
+}): string {
+  const pontos = input.comments.length
+    ? input.comments.map((c) => `• ${c}`).join("\n")
+    : "• Ainda não há comentários de avaliadores registrados nesta etapa.";
+  const fecho =
+    input.approved === true
+      ? "A ideia foi aprovada e seguirá para as próximas conversas de implementação."
+      : input.approved === false
+        ? "Nesta rodada a ideia não foi aprovada, mas os pontos abaixo ajudam a evoluí-la para um próximo ciclo."
+        : "A avaliação segue em andamento e este resumo reflete o que já foi registrado.";
+  return [
+    `Olá, ${input.authorName}!`,
+    "",
+    `Obrigado por submeter a ideia "${input.ideaTitle}". Abaixo está um resumo das considerações dos avaliadores:`,
+    "",
+    pontos,
+    "",
+    fecho,
+    "",
+    "Rascunho gerado por IA simulada — revise e ajuste antes de aprovar o envio.",
+  ].join("\n");
+}

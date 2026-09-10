@@ -8,6 +8,8 @@ import {
   PageHeader,
   crumbLinkClass,
 } from "@/components/AppLayout";
+import { FunnelBuilder } from "@/components/FunnelBuilder";
+import { mechanismLabel } from "@/lib/evaluation";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -341,13 +343,25 @@ function ProgramaDetalhe() {
 
           <section>
             <h2 className="mb-4">Funil de avaliação</h2>
-            <div className="rounded-xl border border-dashed bg-card p-6 text-center">
-              <p className="label-caps">Reservado</p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                A montagem de etapas, transições e regras de avaliação do programa entra no próximo
-                passo do protótipo.
-              </p>
-            </div>
+            {isAdmin ? (
+              <FunnelBuilder programId={program.id} />
+            ) : (
+              <ol className="space-y-2">
+                {program.funnel.stages.map((s, idx) => (
+                  <li key={s.id} className="rounded-xl border bg-card p-4 text-sm">
+                    <span className="font-medium">
+                      {idx + 1}. {s.name}
+                    </span>
+                    <span className="ml-2 text-muted-foreground">
+                      {mechanismLabel[s.mechanism]} · {s.defaultDays} dia(s)
+                    </span>
+                  </li>
+                ))}
+                {program.funnel.stages.length === 0 && (
+                  <li className="text-sm text-muted-foreground">Funil ainda não configurado.</li>
+                )}
+              </ol>
+            )}
           </section>
         </TabsContent>
       </Tabs>
