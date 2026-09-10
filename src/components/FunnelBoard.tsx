@@ -30,6 +30,13 @@ import {
   stageConfigOf,
 } from "@/lib/evaluation";
 import { aiFeedbackFromEvaluations } from "@/lib/ai-mock";
+import { SuggestionTag } from "@/components/SuggestionTag";
+import {
+  duplicateOf,
+  namesOf,
+  suggestEvaluators,
+  triageChecklist,
+} from "@/lib/triage";
 import type { Idea } from "@/lib/types";
 
 export function FunnelBoard({ challengeId }: { challengeId: string }) {
