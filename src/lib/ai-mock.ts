@@ -50,7 +50,7 @@ export function aiReviewChallenge(c: {
   objectiveIds: string[];
   formFields: FormField[];
   kind: Challenge["kind"];
-  deadline?: string;
+  deadline?: string | undefined;
   ownerId: string;
 }): ReviewItem[] {
   const items: ReviewItem[] = [];
