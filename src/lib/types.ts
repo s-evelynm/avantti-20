@@ -118,7 +118,12 @@ export interface Challenge {
   formFields: FormField[];
   kind: "pontual" | "continuo";
   deadline?: string | undefined;
+  /** Sponsor / dono do desafio */
   ownerId: string;
+  /** Gestor responsável pela condução */
+  managerId?: string | undefined;
+  /** Pool de avaliadores por tipo */
+  evaluatorPools?: EvaluatorPools | undefined;
   status: ChallengeStatus;
   createdAt: string;
   /* Épico 2 */
