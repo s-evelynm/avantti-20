@@ -188,7 +188,7 @@ function NovoDesafio() {
               />
             </div>
             <div>
-              <Label className="label-caps">Dono / sponsor</Label>
+              <Label className="label-caps">Patrocinador do desafio</Label>
               <Select value={ownerId} onValueChange={setOwnerId}>
                 <SelectTrigger>
                   <SelectValue />

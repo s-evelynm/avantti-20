@@ -112,7 +112,7 @@ function PaginaPublica() {
           ))}
         </ul>
         <p className="mt-4 text-xs text-muted-foreground">
-          Dono / sponsor: {users.find((u) => u.id === challenge.ownerId)?.name ?? "—"}
+          Patrocinador do desafio: {users.find((u) => u.id === challenge.ownerId)?.name ?? "—"}
         </p>
       </div>
 

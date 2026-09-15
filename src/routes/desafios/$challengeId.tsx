@@ -237,7 +237,7 @@ function DesafioDetalhe() {
               label="Prazo"
               value={challenge.kind === "pontual" ? formatDate(challenge.deadline) : "Sem prazo"}
             />
-            <Info label="Dono / sponsor" value={users.find((u) => u.id === challenge.ownerId)?.name ?? "—"} />
+            <Info label="Patrocinador do desafio" value={users.find((u) => u.id === challenge.ownerId)?.name ?? "—"} />
           </div>
           <div className="rounded-xl border bg-card p-4">
             <p className="label-caps">Objetivos estratégicos</p>
@@ -447,7 +447,7 @@ function EditPanel({ challengeId, onDone }: { challengeId: string; onDone: () =>
           />
         </div>
         <div>
-          <Label className="label-caps">Dono / sponsor</Label>
+          <Label className="label-caps">Patrocinador do desafio</Label>
           <Select value={ownerId} onValueChange={setOwnerId}>
             <SelectTrigger>
               <SelectValue />
