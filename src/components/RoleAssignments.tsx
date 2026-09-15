@@ -93,19 +93,21 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
   return (
     <div className="space-y-6">
       <p className="rounded-lg bg-info-bg p-3 text-sm text-info">
-        Sponsor, gestor responsável e pools de avaliadores são atribuídos exclusivamente aqui. O
-        seletor mostra todas as pessoas: quem não tiver a capacidade necessária recebe um aviso, mas
-        a atribuição não é bloqueada.
+        Quem responde por este desafio é definido só aqui. A lista mostra todas as pessoas: se
+        alguém não tiver a capacidade necessária, aparece um aviso — a escolha continua permitida.
       </p>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border bg-card p-4">
           <Label className="label-caps">{challengeRoleRequirement.sponsor.label}</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Responde pelo desafio e pela decisão final.
+          </p>
           <Select
             value={challenge.ownerId}
-            onValueChange={(v) => setPerson("ownerId", v, "Sponsor do desafio")}
+            onValueChange={(v) => setPerson("ownerId", v, "Patrocinador do desafio")}
           >
-            <SelectTrigger className="mt-2" aria-label="Sponsor do desafio">
+            <SelectTrigger className="mt-2" aria-label="Patrocinador do desafio">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -121,6 +123,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
               <CapabilityWarning
                 user={sponsor}
                 capability={challengeRoleRequirement.sponsor.capability}
+                role="patrocinador"
               />
             </p>
           )}
