@@ -167,14 +167,14 @@ function UsuariosPage() {
           </section>
 
           <section className="rounded-xl border bg-card p-4">
-            <h2 className="text-base font-semibold">Atribuições ativas</h2>
+            <h2 className="text-base font-semibold">Onde esta pessoa já atua</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Somente leitura. Atribuições são editadas dentro do desafio, na aba “Papéis e
-              atribuições”.
+              Só para consulta. Para mudar, abra o desafio e vá em “Papéis e atribuições”.
             </p>
             {assignments.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
-                Esta pessoa ainda não está atribuída em nenhum desafio.
+                Esta pessoa ainda não foi colocada em nenhum desafio. Abra um desafio e use a aba
+                “Papéis e atribuições” para incluí-la.
               </p>
             ) : (
               <ul className="mt-4 space-y-2">
@@ -191,12 +191,13 @@ function UsuariosPage() {
                   .filter(
                     (r, i, arr) =>
                       arr.findIndex((x) => x.capability === r.capability) === i &&
-                      !user.capabilities.includes(r.capability) &&
-                      assignments.length > 0,
+                      !user.capabilities.includes(r.capability),
                   )
                   .map((r) => (
                     <li key={r.capability} className="text-xs text-danger">
-                      Atenção: alguma atribuição pode exigir “{capabilityLabel[r.capability]}”.
+                      {user.name} está atribuída em desafios, mas não tem “
+                      {capabilityLabel[r.capability]}” habilitada. Marque a capacidade acima se ela
+                      precisar dessa função.
                     </li>
                   ))}
               </ul>
