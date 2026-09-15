@@ -194,7 +194,11 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
                           <span className="block text-xs text-muted-foreground">{u.area}</span>
                           {checked && (
                             <span className="mt-1 block">
-                              <CapabilityWarning user={u} capability={requirement.capability} />
+                              <CapabilityWarning
+                                user={u}
+                                capability={requirement.capability}
+                                role={poolTitle[key].toLowerCase()}
+                              />
                             </span>
                           )}
                         </span>
