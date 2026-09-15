@@ -513,29 +513,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const visiblePrograms = (userId: string) =>
     programs.filter((p) => {
       if (p.audience.mode === "todos") return true;
-      const user = USERS.find((u) => u.id === userId);
+      const user = users.find((u) => u.id === userId);
       if (p.audience.mode === "areas") return !!user && p.audience.areas.includes(user.area);
       return p.audience.userIds.includes(userId);
     });
 
+  const updateUserCapabilities: Ctx["updateUserCapabilities"] = (userId, capabilities) => {
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, capabilities } : u)));
+  };
+
   const caps: Capabilities = {
-    participar: visiblePrograms(viewer.id).length > 0,
-    avaliar: challenges.some(
-      (c) => c.evaluatorPoolIds.includes(viewer.id) || c.committeeIds.includes(viewer.id),
-    ),
-    gerenciar: role === "admin" || role === "gestor" || challenges.some((c) => c.ownerId === viewer.id),
-    configurar: role === "admin",
+    // participar nunca depende de capacidade
+    participar: true,
+    avaliar: has("avaliar_ideias"),
+    gerenciar: has("acompanhar_desafios"),
+    configurar: CONFIG_CAPABILITIES.some((c) => has(c)),
+    gerenciarUsuarios: has("gerenciar_usuarios"),
+    configurarProgramas: has("configurar_programas"),
+    configurarDesafios: has("configurar_desafios"),
+    configurarFunil: has("configurar_funil"),
+    gerenciarObjetivos: has("gerenciar_objetivos"),
+    excluirItens: has("excluir_itens"),
+    decidirResultado: has("decidir_resultado"),
+    aprovarComunicacao: has("aprovar_comunicacao"),
   };
 
   const value: Ctx = {
-    role,
     viewAsId,
     setViewAs,
     caps,
+    has,
     currentUser,
 
     areas: AREAS,
-    users: USERS,
+    users,
+    updateUserCapabilities,
     programs,
     objectives,
     challenges,
