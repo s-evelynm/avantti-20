@@ -167,9 +167,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
           return (
             <div key={key} className="rounded-xl border bg-card p-4">
               <p className="label-caps">{poolTitle[key]}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Quem pode ser escalado nesta frente de avaliação.
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{poolHint[key]}</p>
               <ul className="mt-4 space-y-3">
                 {users.map((u) => {
                   const checked = pools[key].includes(u.id);
