@@ -114,9 +114,9 @@ function UsuariosPage() {
           <section className="rounded-xl border bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold">Capacidades de configuração</h2>
+                <h2 className="text-base font-semibold">O que esta pessoa pode configurar</h2>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Permissões de quem constrói e mantém o processo.
+                  Permissões de quem monta e mantém o processo.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={markAllConfig}>
@@ -147,10 +147,10 @@ function UsuariosPage() {
           </section>
 
           <section className="rounded-xl border bg-card p-4">
-            <h2 className="text-base font-semibold">Capacidades de processo</h2>
+            <h2 className="text-base font-semibold">O que esta pessoa pode fazer no processo</h2>
             <p className="mt-1 rounded-lg bg-info-bg p-3 text-xs text-info">
-              Marcar aqui só libera a pessoa a ser atribuída depois. O menu correspondente só mostra
-              conteúdo quando ela for de fato atribuída em algum desafio.
+              Marcar aqui apenas libera a pessoa para ser escolhida depois. Ela só verá conteúdo na
+              tela correspondente quando for colocada em algum desafio.
             </p>
             <ul className="mt-4 space-y-3">
               {PROCESS_CAPABILITIES.map((cap) => (
