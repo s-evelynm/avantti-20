@@ -109,6 +109,7 @@ const AppContext = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [viewAsId, setViewAs] = useState("u1");
+  const [users, setUsers] = useState<AppUser[]>(USERS);
   const [programs, setPrograms] = useState<Program[]>(seedPrograms);
   const [objectives, setObjectives] = useState<Objective[]>(seedObjectives);
   const [challenges, setChallenges] = useState<Challenge[]>(seedChallenges);
