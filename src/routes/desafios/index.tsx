@@ -36,7 +36,7 @@ const rowBg: Record<ChallengeStatus, string> = {
 };
 
 function DesafiosPage() {
-  const { challenges, programs, users, ideas, role } = useApp();
+  const { challenges, programs, users, ideas, caps } = useApp();
   const [programFilter, setProgramFilter] = useState("todos");
   const [statusFilter, setStatusFilter] = useState("todos");
 
@@ -52,7 +52,7 @@ function DesafiosPage() {
         title="Desafios"
         description="Cada desafio pertence a exatamente um programa e passa por Rascunho, Aberto, Pausado e Submissões encerradas."
         action={
-          role === "admin" ? (
+          caps.configurarDesafios ? (
             <Button asChild>
               <Link to="/desafios/novo" search={{ programa: "" }}>
                 Novo desafio

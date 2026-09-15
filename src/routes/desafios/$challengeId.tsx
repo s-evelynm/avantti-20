@@ -11,6 +11,7 @@ import {
 import { FormBuilder } from "@/components/FormBuilder";
 import { FunnelBoard } from "@/components/FunnelBoard";
 import { EvaluationSetup } from "@/components/EvaluationSetup";
+import { RoleAssignments } from "@/components/RoleAssignments";
 import { HistoryList } from "@/components/HistoryList";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ import { useApp, formatDate, formatDateTime, isExpired } from "@/lib/store";
 import { aiReviewChallenge, type ReviewItem } from "@/lib/ai-mock";
 import type { ChallengeStatus } from "@/lib/types";
 
-type Aba = "visao" | "formulario" | "ideias" | "acompanhamento";
+type Aba = "visao" | "formulario" | "papeis" | "ideias" | "acompanhamento";
 
 export const Route = createFileRoute("/desafios/$challengeId")({
   validateSearch: (s: Record<string, unknown>) => ({ aba: ((s["aba"] as Aba) || "visao") as Aba }),
@@ -90,7 +91,7 @@ function DesafioDetalhe() {
       </div>
     );
 
-  const isAdmin = caps.configurar;
+  const isAdmin = caps.configurarDesafios;
   const program = programs.find((p) => p.id === challenge.programId);
   const challengeIdeas = ideas.filter((i) => i.challengeId === challenge.id);
   const expired = isExpired(challenge);
@@ -220,6 +221,7 @@ function DesafioDetalhe() {
         <TabsList>
           <TabsTrigger value="visao">Visão geral</TabsTrigger>
           <TabsTrigger value="formulario">Formulário</TabsTrigger>
+          <TabsTrigger value="papeis">Papéis e atribuições</TabsTrigger>
           <TabsTrigger value="ideias">Ideias ({challengeIdeas.length})</TabsTrigger>
           {showAcompanhamento && <TabsTrigger value="acompanhamento">Acompanhamento</TabsTrigger>}
         </TabsList>
