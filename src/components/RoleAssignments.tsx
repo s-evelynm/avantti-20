@@ -131,12 +131,15 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
 
         <div className="rounded-xl border bg-card p-4">
           <Label className="label-caps">{challengeRoleRequirement.gestor.label}</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Conduz o dia a dia do desafio e move as ideias entre etapas.
+          </p>
           <Select
             value={challenge.managerId ?? ""}
             onValueChange={(v) => setPerson("managerId", v, "Gestor responsável")}
           >
             <SelectTrigger className="mt-2" aria-label="Gestor responsável">
-              <SelectValue placeholder="Selecionar pessoa" />
+              <SelectValue placeholder="Escolher pessoa" />
             </SelectTrigger>
             <SelectContent>
               {users.map((u) => (
@@ -151,6 +154,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
               <CapabilityWarning
                 user={manager}
                 capability={challengeRoleRequirement.gestor.capability}
+                role="gestor responsável"
               />
             </p>
           )}
