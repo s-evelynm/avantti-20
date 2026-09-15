@@ -140,7 +140,8 @@ function AvaliacoesPage() {
           })}
           {pendentes.length === 0 && (
             <p className="rounded-xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
-              Nenhuma avaliação pendente para você.
+              Nada esperando você agora. Quando uma ideia for encaminhada para a sua avaliação, ela
+              aparece nesta lista.
             </p>
           )}
         </TabsContent>
@@ -228,7 +229,7 @@ function AvaliacoesPage() {
 
           {concluidas.length === 0 && (
             <p className="rounded-xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
-              Nenhuma avaliação concluída com os filtros selecionados.
+              Nenhuma avaliação concluída com esses filtros. Limpe os filtros para ver todas.
             </p>
           )}
         </TabsContent>
