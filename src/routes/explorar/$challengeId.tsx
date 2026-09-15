@@ -69,7 +69,7 @@ function PaginaPublica() {
       return f.required && (!v || (Array.isArray(v) ? v.length === 0 : !v.trim()));
     });
     if (missing.length > 0) {
-      toast.error(`Responda: ${missing[0]!.label}`);
+      toast.error(`Falta responder: ${missing[0]!.label}`);
       return;
     }
     addIdea({
