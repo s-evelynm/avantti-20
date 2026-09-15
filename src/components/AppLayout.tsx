@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   Building2,
   Flag,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -33,7 +34,7 @@ interface NavSection {
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { users, viewAsId, setViewAs, caps, role, ideas, challenges, currentUser, funnelOfChallenge } =
+  const { users, viewAsId, setViewAs, caps, ideas, challenges, currentUser, funnelOfChallenge } =
     useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -48,14 +49,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }).length;
 
   const sections: NavSection[] = [];
-  if (caps.participar)
-    sections.push({
-      title: "Participar",
-      items: [
-        { to: "/explorar", label: "Desafios", icon: Target },
-        { to: "/minhas-ideias", label: "Minhas ideias", icon: Lightbulb },
-      ],
-    });
+  // Participar aparece para todo mundo: não depende de capacidade.
+  sections.push({
+    title: "Participar",
+    items: [
+      { to: "/explorar", label: "Desafios", icon: Target },
+      { to: "/minhas-ideias", label: "Minhas ideias", icon: Lightbulb },
+    ],
+  });
   if (caps.avaliar)
     sections.push({
       title: "Avaliar",
@@ -73,23 +74,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
       title: "Acompanhar",
       items: [{ to: "/painel", label: "Painel", icon: LayoutGrid }],
     });
-  if (caps.configurar)
-    sections.push({
-      title: "Configurar",
-      items: [
-        { to: "/programas", label: "Programas", icon: Building2 },
-        { to: "/objetivos", label: "Objetivos estratégicos", icon: Flag },
-      ],
-    });
+  const configItems: NavItem[] = [];
+  if (caps.configurarProgramas || caps.configurarDesafios || caps.configurarFunil)
+    configItems.push({ to: "/programas", label: "Programas", icon: Building2 });
+  if (caps.gerenciarObjetivos)
+    configItems.push({ to: "/objetivos", label: "Objetivos estratégicos", icon: Flag });
+  if (caps.gerenciarUsuarios)
+    configItems.push({ to: "/usuarios", label: "Usuários e permissões", icon: Users });
+  if (configItems.length > 0) sections.push({ title: "Configurar", items: configItems });
 
-  const roleLabel: Record<string, string> = {
-    admin: "Administrador",
-    gestor: "Gestor da inovação",
-    usuario: "Colaborador",
-    avaliador: "Avaliador",
-    comite: "Comitê",
-    sponsor: "Sponsor",
-  };
+  const capsSummary = (count: number) =>
+    count === 0 ? "Sem capacidades" : `${count} capacidade${count > 1 ? "s" : ""}`;
+  const viewer = users.find((u) => u.id === viewAsId);
 
   return (
     <div className="min-h-screen bg-background lg:flex">
@@ -144,7 +140,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <header className="flex flex-wrap items-center justify-end gap-3 border-b bg-card px-6 py-3">
           <div className="text-right">
             <p className="label-caps text-muted-foreground">Ver como</p>
-            <p className="text-xs text-muted-foreground">{roleLabel[role]}</p>
+            <p className="text-xs text-muted-foreground">
+              {capsSummary(viewer?.capabilities.length ?? 0)}
+            </p>
           </div>
           <Select value={viewAsId} onValueChange={setViewAs}>
             <SelectTrigger className="w-60" aria-label="Ver como">
@@ -153,7 +151,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <SelectContent>
               {users.map((u) => (
                 <SelectItem key={u.id} value={u.id}>
-                  {u.name} · {roleLabel[u.role]}
+                  {u.name} · {capsSummary(u.capabilities.length)}
                 </SelectItem>
               ))}
             </SelectContent>
