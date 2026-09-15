@@ -16,6 +16,8 @@ import {
   seedPrograms,
 } from "./seed";
 import type {
+  AppUser,
+  Capability,
   Challenge,
   ChallengeStatus,
   Funnel,
@@ -23,26 +25,38 @@ import type {
   LogEntry,
   Objective,
   Program,
-  Role,
 } from "./types";
+import { CONFIG_CAPABILITIES } from "./permissions";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export interface Capabilities {
+  /** todo mundo participa: ver desafios, página pública e enviar ideias */
   participar: boolean;
   avaliar: boolean;
+  /** acompanhar desafios (painel) */
   gerenciar: boolean;
+  /** qualquer capacidade de configuração */
   configurar: boolean;
+  gerenciarUsuarios: boolean;
+  configurarProgramas: boolean;
+  configurarDesafios: boolean;
+  configurarFunil: boolean;
+  gerenciarObjetivos: boolean;
+  excluirItens: boolean;
+  decidirResultado: boolean;
+  aprovarComunicacao: boolean;
 }
 
 interface Ctx {
-  role: Role;
   viewAsId: string;
   setViewAs: (id: string) => void;
   caps: Capabilities;
+  has: (cap: Capability) => boolean;
   currentUser: { id: string; name: string };
   areas: string[];
-  users: typeof USERS;
+  users: AppUser[];
+  updateUserCapabilities: (userId: string, capabilities: Capability[]) => void;
   programs: Program[];
   objectives: Objective[];
   challenges: Challenge[];
