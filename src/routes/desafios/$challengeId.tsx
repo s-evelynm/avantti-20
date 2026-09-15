@@ -358,7 +358,7 @@ function DesafioDetalhe() {
             </article>
           ))}
           {challengeIdeas.length === 0 && (
-            <p className="text-sm text-muted-foreground">Nenhuma ideia submetida ainda.</p>
+            <p className="text-sm text-muted-foreground">Nenhuma ideia enviada ainda. Assim que alguém participar, as ideias aparecem aqui.</p>
           )}
         </TabsContent>
 

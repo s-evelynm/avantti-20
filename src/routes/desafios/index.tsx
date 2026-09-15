@@ -129,7 +129,7 @@ function DesafiosPage() {
             {list.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-6 text-center text-muted-foreground">
-                  Nenhum desafio com esses filtros.
+                  Nenhum desafio com esses filtros. Troque o programa ou o estado para ver outros.
                 </td>
               </tr>
             )}
