@@ -68,7 +68,7 @@ function UsuariosPage() {
   const assignments: string[] = [];
   challenges.forEach((c) => {
     const pools = c.evaluatorPools;
-    if (c.ownerId === user.id) assignments.push(`Sponsor · ${c.title}`);
+    if (c.ownerId === user.id) assignments.push(`Patrocinador do desafio · ${c.title}`);
     if (c.managerId === user.id) assignments.push(`Gestor responsável · ${c.title}`);
     if (pools?.triagem.includes(user.id)) assignments.push(`Avaliador de triagem · ${c.title}`);
     if (pools?.tecnico.includes(user.id)) assignments.push(`Avaliador técnico · ${c.title}`);
