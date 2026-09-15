@@ -116,9 +116,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [ideas, setIdeas] = useState<Idea[]>(seedIdeas);
   const [logs, setLogs] = useState<LogEntry[]>(seedLogs);
 
-  const viewer = USERS.find((u) => u.id === viewAsId) ?? USERS[0]!;
-  const role: Role = viewer.role;
+  const viewer = users.find((u) => u.id === viewAsId) ?? users[0]!;
   const currentUser = useMemo(() => ({ id: viewer.id, name: viewer.name }), [viewer.id, viewer.name]);
+  const has = (cap: Capability) => viewer.capabilities.includes(cap);
 
 
   const log = useCallback(
