@@ -44,7 +44,7 @@ export function has(user: AppUser | undefined, cap: Capability) {
 
 /** Papéis atribuíveis dentro do desafio e a capacidade que cada um pressupõe. */
 export const challengeRoleRequirement = {
-  sponsor: { label: "Sponsor / dono", capability: "decidir_resultado" as Capability },
+  sponsor: { label: "Patrocinador do desafio", capability: "decidir_resultado" as Capability },
   gestor: { label: "Gestor responsável", capability: "acompanhar_desafios" as Capability },
   triagem: { label: "Avaliadores de triagem", capability: "avaliar_ideias" as Capability },
   tecnico: { label: "Avaliadores técnicos", capability: "avaliar_ideias" as Capability },

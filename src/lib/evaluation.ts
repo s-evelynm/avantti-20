@@ -11,13 +11,13 @@ import type {
 export const mechanismLabel: Record<FunnelStage["mechanism"], string> = {
   nota: "Nota",
   classificacao: "Classificação",
-  gate: "Gate manual",
+  gate: "Aprovação",
   revisao: "Revisão livre",
 };
 
 export const consolidationLabel: Record<StageConfig["consolidation"], string> = {
-  media: "Média aritmética",
-  ponderada: "Média ponderada pelos pesos",
+  media: "Média simples",
+  ponderada: "Média com pesos",
   individual: "Notas individuais (sem cálculo)",
 };
 
