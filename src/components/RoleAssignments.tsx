@@ -17,9 +17,15 @@ const POOL_KEYS = ["triagem", "tecnico", "comite"] as const;
 type PoolKey = (typeof POOL_KEYS)[number];
 
 const poolTitle: Record<PoolKey, string> = {
-  triagem: "Pool de triagem",
-  tecnico: "Pool técnico",
+  triagem: "Grupo de triagem",
+  tecnico: "Grupo técnico",
   comite: "Comitê",
+};
+
+const poolHint: Record<PoolKey, string> = {
+  triagem: "Fazem a primeira leitura das ideias que chegam.",
+  tecnico: "Analisam viabilidade e esforço com mais profundidade.",
+  comite: "Decidem o resultado final das ideias.",
 };
 
 export function poolsOf(challenge: {
@@ -36,12 +42,23 @@ export function poolsOf(challenge: {
   );
 }
 
-function CapabilityWarning({ user, capability }: { user: AppUser; capability: Capability }) {
+function CapabilityWarning({
+  user,
+  capability,
+  role,
+}: {
+  user: AppUser;
+  capability: Capability;
+  role: string;
+}) {
   if (has(user, capability)) return null;
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-danger-bg px-2 py-0.5 text-xs text-danger">
-      <AlertTriangle className="size-3" aria-hidden />
-      Sem a capacidade “{capabilityLabel[capability]}” habilitada
+    <span className="inline-flex items-start gap-1 rounded-lg bg-danger-bg px-2 py-1 text-xs text-danger">
+      <AlertTriangle className="mt-0.5 size-3 shrink-0" aria-hidden />
+      <span>
+        {user.name} não tem “{capabilityLabel[capability]}” habilitada. Pode ficar como {role} mesmo
+        assim — para liberar, marque a capacidade em Usuários e permissões.
+      </span>
     </span>
   );
 }
