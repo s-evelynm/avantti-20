@@ -1,4 +1,15 @@
-export type Role = "admin" | "gestor" | "usuario" | "avaliador" | "comite" | "sponsor";
+/** Capacidades individuais — cada uma liga/desliga de forma independente. */
+export type Capability =
+  | "gerenciar_usuarios"
+  | "configurar_programas"
+  | "configurar_desafios"
+  | "configurar_funil"
+  | "gerenciar_objetivos"
+  | "excluir_itens"
+  | "avaliar_ideias"
+  | "acompanhar_desafios"
+  | "decidir_resultado"
+  | "aprovar_comunicacao";
 
 export type FieldType = "curto" | "longo" | "unica" | "multipla";
 
@@ -14,7 +25,13 @@ export interface AppUser {
   id: string;
   name: string;
   area: string;
-  role: Role;
+  capabilities: Capability[];
+}
+
+export interface EvaluatorPools {
+  triagem: string[];
+  tecnico: string[];
+  comite: string[];
 }
 
 export type AudienceMode = "todos" | "areas" | "usuarios";
