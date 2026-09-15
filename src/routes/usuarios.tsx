@@ -43,7 +43,8 @@ function UsuariosPage() {
       <div>
         <PageHeader title="Usuários e permissões" />
         <p className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-          Você não tem a capacidade "Gerenciar usuários e permissões" habilitada.
+          Esta tela é restrita a quem tem “Gerenciar usuários e permissões” habilitada. Peça a
+          liberação a quem administra o programa.
         </p>
       </div>
     );
@@ -79,7 +80,7 @@ function UsuariosPage() {
     <div>
       <PageHeader
         title="Usuários e permissões"
-        description="Cada pessoa tem capacidades independentes, ligadas uma a uma. Não existem papéis fixos."
+        description="Escolha uma pessoa e defina o que ela pode fazer. Cada permissão é ligada separadamente — não existem perfis prontos."
       />
 
       <div className="grid gap-6 lg:grid-cols-[16rem_1fr]">
