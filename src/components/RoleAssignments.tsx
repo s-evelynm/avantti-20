@@ -17,9 +17,15 @@ const POOL_KEYS = ["triagem", "tecnico", "comite"] as const;
 type PoolKey = (typeof POOL_KEYS)[number];
 
 const poolTitle: Record<PoolKey, string> = {
-  triagem: "Pool de triagem",
-  tecnico: "Pool técnico",
+  triagem: "Grupo de triagem",
+  tecnico: "Grupo técnico",
   comite: "Comitê",
+};
+
+const poolHint: Record<PoolKey, string> = {
+  triagem: "Fazem a primeira leitura das ideias que chegam.",
+  tecnico: "Analisam viabilidade e esforço com mais profundidade.",
+  comite: "Decidem o resultado final das ideias.",
 };
 
 export function poolsOf(challenge: {
@@ -36,12 +42,23 @@ export function poolsOf(challenge: {
   );
 }
 
-function CapabilityWarning({ user, capability }: { user: AppUser; capability: Capability }) {
+function CapabilityWarning({
+  user,
+  capability,
+  role,
+}: {
+  user: AppUser;
+  capability: Capability;
+  role: string;
+}) {
   if (has(user, capability)) return null;
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-danger-bg px-2 py-0.5 text-xs text-danger">
-      <AlertTriangle className="size-3" aria-hidden />
-      Sem a capacidade “{capabilityLabel[capability]}” habilitada
+    <span className="inline-flex items-start gap-1 rounded-lg bg-danger-bg px-2 py-1 text-xs text-danger">
+      <AlertTriangle className="mt-0.5 size-3 shrink-0" aria-hidden />
+      <span>
+        {user.name} não tem “{capabilityLabel[capability]}” habilitada. Pode ficar como {role} mesmo
+        assim — para liberar, marque a capacidade em Usuários e permissões.
+      </span>
     </span>
   );
 }
@@ -76,19 +93,21 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
   return (
     <div className="space-y-6">
       <p className="rounded-lg bg-info-bg p-3 text-sm text-info">
-        Sponsor, gestor responsável e pools de avaliadores são atribuídos exclusivamente aqui. O
-        seletor mostra todas as pessoas: quem não tiver a capacidade necessária recebe um aviso, mas
-        a atribuição não é bloqueada.
+        Quem responde por este desafio é definido só aqui. A lista mostra todas as pessoas: se
+        alguém não tiver a capacidade necessária, aparece um aviso — a escolha continua permitida.
       </p>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border bg-card p-4">
           <Label className="label-caps">{challengeRoleRequirement.sponsor.label}</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Responde pelo desafio e pela decisão final.
+          </p>
           <Select
             value={challenge.ownerId}
-            onValueChange={(v) => setPerson("ownerId", v, "Sponsor do desafio")}
+            onValueChange={(v) => setPerson("ownerId", v, "Patrocinador do desafio")}
           >
-            <SelectTrigger className="mt-2" aria-label="Sponsor do desafio">
+            <SelectTrigger className="mt-2" aria-label="Patrocinador do desafio">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -104,6 +123,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
               <CapabilityWarning
                 user={sponsor}
                 capability={challengeRoleRequirement.sponsor.capability}
+                role="patrocinador"
               />
             </p>
           )}
@@ -111,12 +131,15 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
 
         <div className="rounded-xl border bg-card p-4">
           <Label className="label-caps">{challengeRoleRequirement.gestor.label}</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Conduz o dia a dia do desafio e move as ideias entre etapas.
+          </p>
           <Select
             value={challenge.managerId ?? ""}
             onValueChange={(v) => setPerson("managerId", v, "Gestor responsável")}
           >
             <SelectTrigger className="mt-2" aria-label="Gestor responsável">
-              <SelectValue placeholder="Selecionar pessoa" />
+              <SelectValue placeholder="Escolher pessoa" />
             </SelectTrigger>
             <SelectContent>
               {users.map((u) => (
@@ -131,6 +154,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
               <CapabilityWarning
                 user={manager}
                 capability={challengeRoleRequirement.gestor.capability}
+                role="gestor responsável"
               />
             </p>
           )}
@@ -143,9 +167,7 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
           return (
             <div key={key} className="rounded-xl border bg-card p-4">
               <p className="label-caps">{poolTitle[key]}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Quem pode ser escalado nesta frente de avaliação.
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{poolHint[key]}</p>
               <ul className="mt-4 space-y-3">
                 {users.map((u) => {
                   const checked = pools[key].includes(u.id);
@@ -172,7 +194,11 @@ export function RoleAssignments({ challengeId }: { challengeId: string }) {
                           <span className="block text-xs text-muted-foreground">{u.area}</span>
                           {checked && (
                             <span className="mt-1 block">
-                              <CapabilityWarning user={u} capability={requirement.capability} />
+                              <CapabilityWarning
+                                user={u}
+                                capability={requirement.capability}
+                                role={poolTitle[key].toLowerCase()}
+                              />
                             </span>
                           )}
                         </span>

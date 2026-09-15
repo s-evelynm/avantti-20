@@ -123,7 +123,8 @@ function PainelPage() {
         })}
         {list.length === 0 && (
           <li className="rounded-xl border border-dashed bg-card p-6 text-center text-sm text-muted-foreground">
-            Nenhum desafio aberto para acompanhar ainda.
+            Ainda não há desafio aberto para acompanhar. Assim que um desafio for publicado, o
+            andamento das ideias aparece aqui.
           </li>
         )}
       </ul>

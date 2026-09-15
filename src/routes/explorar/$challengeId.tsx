@@ -69,7 +69,7 @@ function PaginaPublica() {
       return f.required && (!v || (Array.isArray(v) ? v.length === 0 : !v.trim()));
     });
     if (missing.length > 0) {
-      toast.error(`Responda: ${missing[0]!.label}`);
+      toast.error(`Falta responder: ${missing[0]!.label}`);
       return;
     }
     addIdea({
@@ -112,7 +112,7 @@ function PaginaPublica() {
           ))}
         </ul>
         <p className="mt-4 text-xs text-muted-foreground">
-          Dono / sponsor: {users.find((u) => u.id === challenge.ownerId)?.name ?? "—"}
+          Patrocinador do desafio: {users.find((u) => u.id === challenge.ownerId)?.name ?? "—"}
         </p>
       </div>
 

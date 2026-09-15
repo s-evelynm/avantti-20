@@ -43,7 +43,8 @@ function UsuariosPage() {
       <div>
         <PageHeader title="Usuários e permissões" />
         <p className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-          Você não tem a capacidade "Gerenciar usuários e permissões" habilitada.
+          Esta tela é restrita a quem tem “Gerenciar usuários e permissões” habilitada. Peça a
+          liberação a quem administra o programa.
         </p>
       </div>
     );
@@ -68,7 +69,7 @@ function UsuariosPage() {
   const assignments: string[] = [];
   challenges.forEach((c) => {
     const pools = c.evaluatorPools;
-    if (c.ownerId === user.id) assignments.push(`Sponsor · ${c.title}`);
+    if (c.ownerId === user.id) assignments.push(`Patrocinador do desafio · ${c.title}`);
     if (c.managerId === user.id) assignments.push(`Gestor responsável · ${c.title}`);
     if (pools?.triagem.includes(user.id)) assignments.push(`Avaliador de triagem · ${c.title}`);
     if (pools?.tecnico.includes(user.id)) assignments.push(`Avaliador técnico · ${c.title}`);
@@ -79,7 +80,7 @@ function UsuariosPage() {
     <div>
       <PageHeader
         title="Usuários e permissões"
-        description="Cada pessoa tem capacidades independentes, ligadas uma a uma. Não existem papéis fixos."
+        description="Escolha uma pessoa e defina o que ela pode fazer. Cada permissão é ligada separadamente — não existem perfis prontos."
       />
 
       <div className="grid gap-6 lg:grid-cols-[16rem_1fr]">
@@ -113,9 +114,9 @@ function UsuariosPage() {
           <section className="rounded-xl border bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold">Capacidades de configuração</h2>
+                <h2 className="text-base font-semibold">O que esta pessoa pode configurar</h2>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Permissões de quem constrói e mantém o processo.
+                  Permissões de quem monta e mantém o processo.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={markAllConfig}>
@@ -146,10 +147,10 @@ function UsuariosPage() {
           </section>
 
           <section className="rounded-xl border bg-card p-4">
-            <h2 className="text-base font-semibold">Capacidades de processo</h2>
+            <h2 className="text-base font-semibold">O que esta pessoa pode fazer no processo</h2>
             <p className="mt-1 rounded-lg bg-info-bg p-3 text-xs text-info">
-              Marcar aqui só libera a pessoa a ser atribuída depois. O menu correspondente só mostra
-              conteúdo quando ela for de fato atribuída em algum desafio.
+              Marcar aqui apenas libera a pessoa para ser escolhida depois. Ela só verá conteúdo na
+              tela correspondente quando for colocada em algum desafio.
             </p>
             <ul className="mt-4 space-y-3">
               {PROCESS_CAPABILITIES.map((cap) => (
@@ -167,14 +168,14 @@ function UsuariosPage() {
           </section>
 
           <section className="rounded-xl border bg-card p-4">
-            <h2 className="text-base font-semibold">Atribuições ativas</h2>
+            <h2 className="text-base font-semibold">Onde esta pessoa já atua</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Somente leitura. Atribuições são editadas dentro do desafio, na aba “Papéis e
-              atribuições”.
+              Só para consulta. Para mudar, abra o desafio e vá em “Papéis e atribuições”.
             </p>
             {assignments.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
-                Esta pessoa ainda não está atribuída em nenhum desafio.
+                Esta pessoa ainda não foi colocada em nenhum desafio. Abra um desafio e use a aba
+                “Papéis e atribuições” para incluí-la.
               </p>
             ) : (
               <ul className="mt-4 space-y-2">
@@ -191,12 +192,13 @@ function UsuariosPage() {
                   .filter(
                     (r, i, arr) =>
                       arr.findIndex((x) => x.capability === r.capability) === i &&
-                      !user.capabilities.includes(r.capability) &&
-                      assignments.length > 0,
+                      !user.capabilities.includes(r.capability),
                   )
                   .map((r) => (
                     <li key={r.capability} className="text-xs text-danger">
-                      Atenção: alguma atribuição pode exigir “{capabilityLabel[r.capability]}”.
+                      {user.name} está atribuída em desafios, mas não tem “
+                      {capabilityLabel[r.capability]}” habilitada. Marque a capacidade acima se ela
+                      precisar dessa função.
                     </li>
                   ))}
               </ul>

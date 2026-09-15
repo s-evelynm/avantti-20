@@ -168,7 +168,7 @@ function Explorar() {
 
         {list.length === 0 && (
           <li className="rounded-xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground lg:col-span-2">
-            Nenhum desafio nesta aba para o seu perfil no momento.
+            Nenhum desafio aqui no momento. Tente outra aba ou desmarque o filtro acima.
           </li>
         )}
       </ul>

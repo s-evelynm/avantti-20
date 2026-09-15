@@ -58,7 +58,7 @@ export function FunnelBoard({ challengeId }: { challengeId: string }) {
   return (
     <div>
       <div className="mb-4 rounded-lg bg-primary-soft p-4 text-sm">
-        Nenhum card se move sozinho: mesmo com o sinal de prontidão atingido, o avanço é sempre uma
+        Nenhum card se move sozinho: mesmo quando a etapa já está pronta para avançar, o avanço é sempre uma
         ação manual de uma pessoa.
       </div>
 
@@ -290,7 +290,7 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
           <section className="rounded-xl border bg-card p-4">
             <p className="label-caps">Distribuição desta etapa</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Escolha entre o pool de avaliadores elegíveis do desafio.
+              Escolha entre as pessoas do grupo de avaliadores deste desafio.
             </p>
 
             {suggestion && suggestion.suggestedIds.length > 0 && (
@@ -348,7 +348,7 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
               ))}
               {challenge.evaluatorPoolIds.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                  O desafio ainda não tem pool de avaliadores.
+                  Este desafio ainda não tem grupo de avaliadores. Defina em “Papéis e atribuições”.
                 </p>
               )}
             </div>
@@ -574,8 +574,8 @@ function IdeaPanel({ idea, challengeId }: { idea: Idea; challengeId: string }) {
             <p className="label-caps">Avanço manual</p>
             <p className="mt-2 text-sm">
               {ready
-                ? "Sinal de prontidão atingido. O avanço continua dependendo de uma ação sua."
-                : `Sinal de prontidão ainda não atingido${stage.readiness ? `: ${stage.readiness}` : ""}. Você pode avançar mesmo assim.`}
+                ? "A etapa já está pronta para avançar. O avanço continua dependendo de uma ação sua."
+                : `A etapa ainda não está pronta para avançar${stage.readiness ? `: ${stage.readiness}` : ""}. Você pode avançar mesmo assim.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {options.map((o) => (

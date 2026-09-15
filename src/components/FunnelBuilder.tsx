@@ -342,7 +342,7 @@ export function FunnelBuilder({ programId }: { programId: string }) {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor={`readiness-${selected.id}`}>Sinal de prontidão</Label>
+                    <Label htmlFor={`readiness-${selected.id}`}>Quando a etapa está pronta para avançar</Label>
                     <Input
                       id={`readiness-${selected.id}`}
                       className="mt-1.5 bg-background"

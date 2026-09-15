@@ -1,5 +1,5 @@
 import { Link, useRouterState, type LinkProps } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Target,
   Lightbulb,
@@ -8,10 +8,16 @@ import {
   Building2,
   Flag,
   Users,
+  Menu,
+  Info,
   type LucideIcon,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
+import { capabilityLabel } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Select,
   SelectContent,
@@ -29,20 +35,21 @@ interface NavItem {
 }
 
 interface NavSection {
+  /** vazio quando a seção tem um item só e não precisa de agrupamento */
   title: string;
   items: NavItem[];
 }
 
-export function AppLayout({ children }: { children: ReactNode }) {
-  const { users, viewAsId, setViewAs, caps, ideas, challenges, currentUser, funnelOfChallenge } =
-    useApp();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+function useNavSections() {
+  const { caps, ideas, challenges, currentUser, funnelOfChallenge } = useApp();
 
   const pendentes = ideas.filter((idea) => {
     if (!idea.currentStageId) return false;
     const challenge = challenges.find((c) => c.id === idea.challengeId);
     if (!challenge) return false;
-    const stage = funnelOfChallenge(idea.challengeId).stages.find((s) => s.id === idea.currentStageId);
+    const stage = funnelOfChallenge(idea.challengeId).stages.find(
+      (s) => s.id === idea.currentStageId,
+    );
     if (!stage) return false;
     if (!(idea.assignments[stage.id] ?? []).includes(currentUser.id)) return false;
     return !idea.evaluations.some((e) => e.stageId === stage.id && e.evaluatorId === currentUser.id);
@@ -81,15 +88,122 @@ export function AppLayout({ children }: { children: ReactNode }) {
     configItems.push({ to: "/objetivos", label: "Objetivos estratégicos", icon: Flag });
   if (caps.gerenciarUsuarios)
     configItems.push({ to: "/usuarios", label: "Usuários e permissões", icon: Users });
-  if (configItems.length > 0) sections.push({ title: "Configurar", items: configItems });
+  // Com um item só, o agrupamento "Configurar" não ajuda ninguém.
+  if (configItems.length > 0)
+    sections.push({ title: configItems.length === 1 ? "" : "Configurar", items: configItems });
 
-  const capsSummary = (count: number) =>
-    count === 0 ? "Sem capacidades" : `${count} capacidade${count > 1 ? "s" : ""}`;
+  return sections;
+}
+
+function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  const sections = useNavSections();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  return (
+    <nav className="space-y-6 px-3 pb-6">
+      {sections.map((s, index) => (
+        <div key={s.title || `secao-${index}`}>
+          {s.title && <p className="label-caps px-3 text-muted-foreground">{s.title}</p>}
+          <ul className={cn("space-y-1", s.title && "mt-2")}>
+            {s.items.map((n) => {
+              const path = String(n.to);
+              const active = n.exact ? pathname === path : pathname.startsWith(path);
+              const Icon = n.icon;
+              return (
+                <li key={path}>
+                  <Link
+                    to={path}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                      active
+                        ? "bg-primary-soft font-medium text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="size-4 shrink-0" aria-hidden />
+                    <span className="truncate">{n.label}</span>
+                    {n.badge ? (
+                      <span className="ml-auto rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary">
+                        {n.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function ViewAsBlock() {
+  const { users, viewAsId, setViewAs } = useApp();
   const viewer = users.find((u) => u.id === viewAsId);
 
   return (
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="text-right">
+        <p className="label-caps text-muted-foreground">Você está vendo como</p>
+        <p className="text-xs text-muted-foreground">
+          Trocar de pessoa muda o menu e as telas disponíveis.
+        </p>
+      </div>
+      <Select value={viewAsId} onValueChange={setViewAs}>
+        <SelectTrigger className="w-56" aria-label="Escolher a pessoa que você está vendo como">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {users.map((u) => (
+            <SelectItem key={u.id} value={u.id}>
+              {u.name} · {u.area}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm">
+            O que essa pessoa pode fazer
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-80">
+          <p className="text-sm font-medium">{viewer?.name}</p>
+          <p className="text-xs text-muted-foreground">{viewer?.area}</p>
+          {viewer && viewer.capabilities.length > 0 ? (
+            <ul className="mt-3 space-y-1 text-sm">
+              {viewer.capabilities.map((c) => (
+                <li key={c} className="text-muted-foreground">
+                  {capabilityLabel[c]}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Nenhuma capacidade habilitada. Mesmo assim ela vê os desafios, envia ideias e
+              acompanha as próprias ideias.
+            </p>
+          )}
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+export function AppLayout({ children }: { children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  return (
     <div className="min-h-screen bg-background lg:flex">
-      <aside className="border-b bg-card lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:border-r lg:border-b-0">
+      <aside className="hidden bg-card lg:sticky lg:top-0 lg:block lg:h-screen lg:w-64 lg:shrink-0 lg:border-r">
         <div className="flex h-16 items-center px-6">
           <Link
             to="/"
@@ -98,66 +212,40 @@ export function AppLayout({ children }: { children: ReactNode }) {
             Avantti
           </Link>
         </div>
-        <nav className="space-y-6 px-3 pb-6">
-          {sections.map((s) => (
-            <div key={s.title}>
-              <p className="label-caps px-3 text-muted-foreground">{s.title}</p>
-              <ul className="mt-2 space-y-1">
-                {s.items.map((n) => {
-                  const path = String(n.to);
-                  const active = n.exact ? pathname === path : pathname.startsWith(path);
-                  const Icon = n.icon;
-                  return (
-                    <li key={path}>
-                      <Link
-                        to={path}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                          active
-                            ? "bg-primary-soft font-medium text-primary"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" aria-hidden />
-                        <span className="truncate">{n.label}</span>
-                        {n.badge ? (
-                          <span className="ml-auto rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary">
-                            {n.badge}
-                          </span>
-                        ) : null}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </nav>
+        <SidebarNav />
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="flex flex-wrap items-center justify-end gap-3 border-b bg-card px-6 py-3">
-          <div className="text-right">
-            <p className="label-caps text-muted-foreground">Ver como</p>
-            <p className="text-xs text-muted-foreground">
-              {capsSummary(viewer?.capabilities.length ?? 0)}
-            </p>
+        <p className="flex items-center gap-2 border-b bg-info-bg px-6 py-2 text-xs text-info">
+          <Info className="size-3.5 shrink-0" aria-hidden />
+          Versão de demonstração: os dados são fictícios e nada do que você fizer aqui é salvo.
+        </p>
+        <header className="flex flex-wrap items-center gap-3 border-b bg-card px-4 py-3 lg:justify-end lg:px-6">
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="lg:hidden" aria-label="Abrir menu">
+                <Menu className="size-4" aria-hidden />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0">
+              <SheetTitle className="px-6 py-4 text-lg font-semibold text-primary">
+                Avantti
+              </SheetTitle>
+              <SidebarNav onNavigate={() => setMenuOpen(false)} />
+            </SheetContent>
+          </Sheet>
+          <Link
+            to="/"
+            className="text-lg font-semibold text-primary lg:hidden"
+            aria-label="Início"
+          >
+            Avantti
+          </Link>
+          <div className="ml-auto lg:ml-0">
+            <ViewAsBlock />
           </div>
-          <Select value={viewAsId} onValueChange={setViewAs}>
-            <SelectTrigger className="w-60" aria-label="Ver como">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {users.map((u) => (
-                <SelectItem key={u.id} value={u.id}>
-                  {u.name} · {capsSummary(u.capabilities.length)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </header>
-        <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
+        <main className="mx-auto max-w-5xl px-4 py-8 lg:px-6">{children}</main>
       </div>
     </div>
   );

@@ -260,7 +260,7 @@ function ProgramaDetalhe() {
               </li>
             ))}
             {programChallenges.length === 0 && (
-              <li className="text-sm text-muted-foreground">Nenhum desafio vinculado ainda.</li>
+              <li className="text-sm text-muted-foreground">Nenhum desafio vinculado ainda. Crie o primeiro desafio deste programa.</li>
             )}
           </ul>
         </TabsContent>
