@@ -322,6 +322,10 @@ function DesafioDetalhe() {
           )}
         </TabsContent>
 
+        <TabsContent value="papeis" className="mt-6 space-y-4">
+          <RoleAssignments challengeId={challenge.id} />
+        </TabsContent>
+
         <TabsContent value="ideias" className="mt-6 space-y-4">
           {challengeIdeas.map((i) => (
             <article key={i.id} className="rounded-xl border border-l-[3px] border-l-brand-pink bg-card p-4">
