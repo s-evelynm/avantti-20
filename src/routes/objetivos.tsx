@@ -37,7 +37,7 @@ function ObjetivosPage() {
     useApp();
   const [editing, setEditing] = useState<string | null>(null);
   const [highlight, setHighlight] = useState<string | null>(null);
-  const readOnly = !caps.configurar;
+  const readOnly = !caps.gerenciarObjetivos;
 
   return (
     <div>

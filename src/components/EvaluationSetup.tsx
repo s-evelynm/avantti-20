@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,7 +16,7 @@ import type { Consolidation, Criterion } from "@/lib/types";
 const uid = () => Math.random().toString(36).slice(2, 8);
 
 export function EvaluationSetup({ challengeId }: { challengeId: string }) {
-  const { challenges, users, funnelOfChallenge, updateChallenge } = useApp();
+  const { challenges, funnelOfChallenge, updateChallenge } = useApp();
   const challenge = challenges.find((c) => c.id === challengeId)!;
   const funnel = funnelOfChallenge(challengeId);
 
@@ -50,67 +49,6 @@ export function EvaluationSetup({ challengeId }: { challengeId: string }) {
 
   return (
     <div className="space-y-8">
-      <section className="space-y-4">
-        <h3 className="font-semibold">Papéis do desafio</h3>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border bg-card p-4">
-            <p className="label-caps">Pool de avaliadores elegíveis</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Quem PODE ser escalado. A distribuição por ideia acontece no acompanhamento do funil.
-            </p>
-            <div className="mt-4 space-y-2">
-              {users.map((u) => (
-                <label key={u.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={challenge.evaluatorPoolIds.includes(u.id)}
-                    onCheckedChange={(v) =>
-                      updateChallenge(
-                        challenge.id,
-                        {
-                          evaluatorPoolIds: v
-                            ? [...challenge.evaluatorPoolIds, u.id]
-                            : challenge.evaluatorPoolIds.filter((x) => x !== u.id),
-                        },
-                        `Pool de avaliadores alterado (${u.name}).`,
-                      )
-                    }
-                  />
-                  {u.name} <span className="text-xs text-muted-foreground">· {u.area}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-card p-4">
-            <p className="label-caps">Comitê de decisão</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Delibera nas etapas de classificação e registra a decisão final com ata.
-            </p>
-            <div className="mt-4 space-y-2">
-              {users.map((u) => (
-                <label key={u.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={challenge.committeeIds.includes(u.id)}
-                    onCheckedChange={(v) =>
-                      updateChallenge(
-                        challenge.id,
-                        {
-                          committeeIds: v
-                            ? [...challenge.committeeIds, u.id]
-                            : challenge.committeeIds.filter((x) => x !== u.id),
-                        },
-                        `Comitê de decisão alterado (${u.name}).`,
-                      )
-                    }
-                  />
-                  {u.name} <span className="text-xs text-muted-foreground">· {u.area}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="space-y-4">
         <h3 className="font-semibold">Configuração por etapa</h3>
         {funnel.stages.map((stage) => {

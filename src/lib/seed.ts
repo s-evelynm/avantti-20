@@ -26,13 +26,44 @@ export const AREAS = [
 ];
 
 export const USERS: AppUser[] = [
-  { id: "u1", name: "Evelyn Monteiro", area: "Tecnologia", role: "admin" },
-  { id: "u2", name: "Rafael Andrade", area: "Operações", role: "gestor" },
-  { id: "u3", name: "Camila Torres", area: "Comercial", role: "usuario" },
-  { id: "u4", name: "Bruno Salgado", area: "Tecnologia", role: "usuario" },
-  { id: "u5", name: "Larissa Pinho", area: "Recursos Humanos", role: "avaliador" },
-  { id: "u6", name: "Diego Ferraz", area: "Financeiro", role: "comite" },
-  { id: "u7", name: "Marina Bastos", area: "Marketing", role: "avaliador" },
+  {
+    id: "u1",
+    name: "Evelyn Monteiro",
+    area: "Tecnologia",
+    capabilities: [
+      "gerenciar_usuarios",
+      "configurar_programas",
+      "configurar_desafios",
+      "configurar_funil",
+      "gerenciar_objetivos",
+      "excluir_itens",
+      "acompanhar_desafios",
+      "decidir_resultado",
+      "aprovar_comunicacao",
+    ],
+  },
+  {
+    id: "u2",
+    name: "Rafael Andrade",
+    area: "Operações",
+    capabilities: [
+      "configurar_desafios",
+      "configurar_funil",
+      "acompanhar_desafios",
+      "avaliar_ideias",
+      "aprovar_comunicacao",
+    ],
+  },
+  { id: "u3", name: "Camila Torres", area: "Comercial", capabilities: [] },
+  { id: "u4", name: "Bruno Salgado", area: "Tecnologia", capabilities: ["avaliar_ideias"] },
+  { id: "u5", name: "Larissa Pinho", area: "Recursos Humanos", capabilities: ["avaliar_ideias"] },
+  {
+    id: "u6",
+    name: "Diego Ferraz",
+    area: "Financeiro",
+    capabilities: ["avaliar_ideias", "acompanhar_desafios", "decidir_resultado"],
+  },
+  { id: "u7", name: "Marina Bastos", area: "Marketing", capabilities: ["avaliar_ideias"] },
 ];
 
 export const FIXED_FIELDS_NOTE =
@@ -251,6 +282,8 @@ export const seedChallenges: Challenge[] = [
     kind: "pontual",
     deadline: "2026-11-30",
     ownerId: "u2",
+    managerId: "u2",
+    evaluatorPools: { triagem: ["u2"], tecnico: ["u5", "u7"], comite: ["u1", "u6"] },
     status: "aberto",
     createdAt: "2026-01-15T13:00:00.000Z",
     criteria: critC1,
@@ -288,6 +321,8 @@ export const seedChallenges: Challenge[] = [
     kind: "pontual",
     deadline: "2026-08-15",
     ownerId: "u6",
+    managerId: "u6",
+    evaluatorPools: { triagem: ["u4"], tecnico: ["u5", "u7"], comite: ["u1", "u6"] },
     status: "aberto",
     createdAt: "2026-02-05T13:00:00.000Z",
     criteria: critC3,

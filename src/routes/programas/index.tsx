@@ -28,7 +28,7 @@ export function audienceLabel(p: Program, users: { id: string; name: string }[])
 }
 
 function ProgramasPage() {
-  const { programs, challenges, users, role } = useApp();
+  const { programs, challenges, users, caps } = useApp();
 
   return (
     <div>
@@ -36,7 +36,7 @@ function ProgramasPage() {
         title="Programas"
         description="Nível hierárquico acima do desafio. Cada programa reúne contexto, recurso, público elegível e seus desafios."
         action={
-          role === "admin" ? (
+          caps.configurarProgramas ? (
             <Button asChild>
               <Link to="/programas/novo">Novo programa</Link>
             </Button>

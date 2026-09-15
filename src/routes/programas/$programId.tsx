@@ -80,7 +80,7 @@ function ProgramaDetalhe() {
       </div>
     );
 
-  const isAdmin = caps.configurar;
+  const isAdmin = caps.configurarProgramas;
   const programChallenges = challenges.filter((c) => c.programId === program.id);
   const eligible = users.filter((u) =>
     program.audience.mode === "todos"

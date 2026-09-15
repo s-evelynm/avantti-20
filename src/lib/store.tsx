@@ -16,6 +16,8 @@ import {
   seedPrograms,
 } from "./seed";
 import type {
+  AppUser,
+  Capability,
   Challenge,
   ChallengeStatus,
   Funnel,
@@ -23,26 +25,38 @@ import type {
   LogEntry,
   Objective,
   Program,
-  Role,
 } from "./types";
+import { CONFIG_CAPABILITIES } from "./permissions";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export interface Capabilities {
+  /** todo mundo participa: ver desafios, página pública e enviar ideias */
   participar: boolean;
   avaliar: boolean;
+  /** acompanhar desafios (painel) */
   gerenciar: boolean;
+  /** qualquer capacidade de configuração */
   configurar: boolean;
+  gerenciarUsuarios: boolean;
+  configurarProgramas: boolean;
+  configurarDesafios: boolean;
+  configurarFunil: boolean;
+  gerenciarObjetivos: boolean;
+  excluirItens: boolean;
+  decidirResultado: boolean;
+  aprovarComunicacao: boolean;
 }
 
 interface Ctx {
-  role: Role;
   viewAsId: string;
   setViewAs: (id: string) => void;
   caps: Capabilities;
+  has: (cap: Capability) => boolean;
   currentUser: { id: string; name: string };
   areas: string[];
-  users: typeof USERS;
+  users: AppUser[];
+  updateUserCapabilities: (userId: string, capabilities: Capability[]) => void;
   programs: Program[];
   objectives: Objective[];
   challenges: Challenge[];
@@ -95,15 +109,16 @@ const AppContext = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [viewAsId, setViewAs] = useState("u1");
+  const [users, setUsers] = useState<AppUser[]>(USERS);
   const [programs, setPrograms] = useState<Program[]>(seedPrograms);
   const [objectives, setObjectives] = useState<Objective[]>(seedObjectives);
   const [challenges, setChallenges] = useState<Challenge[]>(seedChallenges);
   const [ideas, setIdeas] = useState<Idea[]>(seedIdeas);
   const [logs, setLogs] = useState<LogEntry[]>(seedLogs);
 
-  const viewer = USERS.find((u) => u.id === viewAsId) ?? USERS[0]!;
-  const role: Role = viewer.role;
+  const viewer = users.find((u) => u.id === viewAsId) ?? users[0]!;
   const currentUser = useMemo(() => ({ id: viewer.id, name: viewer.name }), [viewer.id, viewer.name]);
+  const has = (cap: Capability) => viewer.capabilities.includes(cap);
 
 
   const log = useCallback(
@@ -498,29 +513,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const visiblePrograms = (userId: string) =>
     programs.filter((p) => {
       if (p.audience.mode === "todos") return true;
-      const user = USERS.find((u) => u.id === userId);
+      const user = users.find((u) => u.id === userId);
       if (p.audience.mode === "areas") return !!user && p.audience.areas.includes(user.area);
       return p.audience.userIds.includes(userId);
     });
 
+  const updateUserCapabilities: Ctx["updateUserCapabilities"] = (userId, capabilities) => {
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, capabilities } : u)));
+  };
+
   const caps: Capabilities = {
-    participar: visiblePrograms(viewer.id).length > 0,
-    avaliar: challenges.some(
-      (c) => c.evaluatorPoolIds.includes(viewer.id) || c.committeeIds.includes(viewer.id),
-    ),
-    gerenciar: role === "admin" || role === "gestor" || challenges.some((c) => c.ownerId === viewer.id),
-    configurar: role === "admin",
+    // participar nunca depende de capacidade
+    participar: true,
+    avaliar: has("avaliar_ideias"),
+    gerenciar: has("acompanhar_desafios"),
+    configurar: CONFIG_CAPABILITIES.some((c) => has(c)),
+    gerenciarUsuarios: has("gerenciar_usuarios"),
+    configurarProgramas: has("configurar_programas"),
+    configurarDesafios: has("configurar_desafios"),
+    configurarFunil: has("configurar_funil"),
+    gerenciarObjetivos: has("gerenciar_objetivos"),
+    excluirItens: has("excluir_itens"),
+    decidirResultado: has("decidir_resultado"),
+    aprovarComunicacao: has("aprovar_comunicacao"),
   };
 
   const value: Ctx = {
-    role,
     viewAsId,
     setViewAs,
     caps,
+    has,
     currentUser,
 
     areas: AREAS,
-    users: USERS,
+    users,
+    updateUserCapabilities,
     programs,
     objectives,
     challenges,
